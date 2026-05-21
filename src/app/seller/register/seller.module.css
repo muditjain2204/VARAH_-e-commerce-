@@ -1,0 +1,375 @@
+.page {
+  padding-top: 140px;
+  padding-bottom: 4rem;
+  min-height: 100vh;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--gradient-card);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-xl);
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 152, 42, 0.06) 0%, transparent 60%);
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.heroDesc {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.heroStats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.heroStat {
+  text-align: center;
+}
+
+.heroStatValue {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 700;
+  background: var(--gradient-gold-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heroStatLabel {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Benefits */
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.benefitCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.benefitCard:hover {
+  border-color: var(--border-gold);
+  box-shadow: var(--shadow-gold);
+  transform: translateY(-4px);
+}
+
+.benefitIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: rgba(212, 152, 42, 0.08);
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: var(--color-accent);
+}
+
+.benefitCard h3 {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.benefitCard p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Form Section */
+.formSection {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.formHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.formTitle {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.formSubtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Steps */
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.stepCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-subtle);
+  color: var(--text-muted);
+  transition: all var(--transition-base);
+}
+
+.stepActive .stepCircle {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--text-inverse);
+}
+
+.stepDone .stepCircle {
+  background: var(--emerald-light);
+  border-color: var(--emerald-light);
+  color: white;
+}
+
+.stepLabel {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.stepActive .stepLabel {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Form Card */
+.formCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sectionLabel svg {
+  color: var(--color-accent);
+}
+
+.bankNote {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(212, 152, 42, 0.05);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.input,
+.select,
+.textarea {
+  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.select {
+  appearance: auto;
+  cursor: pointer;
+}
+
+/* Upload Zone */
+.uploadZone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: var(--bg-tertiary);
+  border: 2px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  color: var(--text-muted);
+}
+
+.uploadZone:hover {
+  border-color: var(--color-accent);
+}
+
+.uploadZone p {
+  font-size: 0.88rem;
+  margin-top: 0.5rem;
+}
+
+.uploadZone strong {
+  color: var(--color-accent);
+}
+
+.uploadZone span {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroStats {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .steps {
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .stepLabel {
+    display: none;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .formActions .btn {
+    width: 100%;
+  }
+}

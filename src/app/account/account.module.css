@@ -1,0 +1,163 @@
+.page {
+  min-height: 100vh;
+  padding: 120px 0 60px;
+  background-color: var(--bg-body);
+}
+
+.container {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.profileCard {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.05) 0%, transparent 100%);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  background-color: var(--gold-100);
+  color: var(--gold-500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.profileCard h3 {
+  font-family: var(--font-playfair);
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.profileCard p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
+}
+
+.nav a, .logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav a:hover, .logoutBtn:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav a.active {
+  color: var(--gold-500);
+  background-color: rgba(212, 175, 55, 0.1);
+  border-right: 3px solid var(--gold-500);
+}
+
+.logoutBtn {
+  color: #ef4444;
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+}
+
+.logoutBtn:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.content {
+  flex: 1;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.infoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.infoGroup label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  font-weight: 600;
+}
+
+.infoValue {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: var(--bg-body);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.infoValue svg {
+  color: var(--gold-500);
+}
+
+.badge {
+  background-color: var(--gold-500);
+  color: #fff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+  }
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+}
