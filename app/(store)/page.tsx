@@ -70,12 +70,12 @@ export default async function HomePage() {
             backgroundImage: "url('/hero/palace-bg.webp')",
           }}
         >
-          {/* Refined warm atmospheric overlays that keep the palace colors vibrant while preserving typography legibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#faf8f5]/75 via-transparent to-[#faf8f5]/60 pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,245,220,0.2),transparent_70%)] pointer-events-none" />
-          {/* Edge blend into page layout */}
-          <div className="absolute top-0 inset-x-0 h-14 bg-gradient-to-b from-[#faf8f5]/90 to-transparent pointer-events-none" />
-          <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#faf8f5] to-transparent pointer-events-none" />
+          {/* Subtle warm cream / ivory luxury overlays for perfect typography legibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#faf8f5]/95 via-[#faf8f5]/40 to-[#faf8f5]/90 pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_35%,rgba(255,250,240,0.7),transparent_75%)] pointer-events-none" />
+          {/* Subtle top & bottom edge blend into theme */}
+          <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[#faf8f5] to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[#faf8f5] to-transparent pointer-events-none" />
         </div>
 
         {/* Hero Top Content: Editorial Typography & CTAs (Shifted cleanly upper) */}
