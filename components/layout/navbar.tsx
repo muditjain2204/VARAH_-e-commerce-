@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   SignInButton,
+  SignUpButton,
   Show,
   UserButton,
 } from "@clerk/nextjs";
@@ -359,11 +360,23 @@ export function Navbar() {
 
             {/* Auth */}
             <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-colors">
-                  Sign In
+              <div className="hidden sm:flex items-center gap-1.5 ml-1">
+                <SignInButton mode="modal">
+                  <button className="px-3 py-1.5 text-xs font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-lg transition-colors">
+                    Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button className="px-3.5 py-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors shadow-xs">
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </div>
+              <SignUpButton mode="modal">
+                <button className="sm:hidden px-2.5 py-1 text-[11px] font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors shadow-xs">
+                  Sign Up
                 </button>
-              </SignInButton>
+              </SignUpButton>
             </Show>
             <Show when="signed-in">
               <UserButton
@@ -423,6 +436,42 @@ export function Navbar() {
                 <X className="h-5 w-5" />
               </button>
             </div>
+
+            {/* Mobile Auth Bar */}
+            <Show when="signed-out">
+              <div className="px-4 py-3 bg-[#0e1015] border-b border-stone-800 flex items-center gap-2">
+                <SignInButton mode="modal">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex-1 py-2 px-3 text-xs font-semibold text-stone-200 bg-stone-800 hover:bg-stone-700 rounded-lg text-center transition-colors"
+                  >
+                    Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex-1 py-2 px-3 text-xs font-bold text-stone-950 bg-amber-400 hover:bg-amber-300 rounded-lg text-center transition-colors shadow-xs"
+                  >
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </div>
+            </Show>
+            <Show when="signed-in">
+              <div className="px-4 py-2.5 bg-[#0e1015] border-b border-stone-800 flex items-center justify-between">
+                <span className="text-xs text-stone-400 font-medium">Logged in</span>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "h-7 w-7",
+                    },
+                  }}
+                />
+              </div>
+            </Show>
 
             {/* Top Tabs: Popular | Sarees (Exact UI from screenshot) */}
             <div className="flex border-b border-stone-800 bg-[#0e1015]">
