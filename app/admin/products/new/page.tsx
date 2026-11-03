@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Sparkles, UploadCloud, Check } from "lucide-react";
 import { createProductAction, CreateProductInput } from "@/actions/admin-product.actions";
+import { getAdminCategoriesAction } from "@/actions/admin-category.actions";
 import { toast } from "sonner";
 
 const PRESETS = [
@@ -31,11 +32,12 @@ export default function NewProductPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
   const [formData, setFormData] = useState<CreateProductInput>({
     name: "",
     description: "",
     shortDescription: "",
-    categoryId: "cat_silk",
+    categoryId: "silk",
     basePrice: 12999,
     salePrice: 10999,
     fabric: "Pure Silk",
@@ -45,6 +47,16 @@ export default function NewProductPage() {
     imageUrl: PRESETS[0].url,
     stockQuantity: 10,
   });
+
+  useEffect(() => {
+    getAdminCategoriesAction().then((res) => {
+      if (res.success && res.data && res.data.length > 0) {
+        const catList = res.data;
+        setCategories(catList.map((c) => ({ id: c.id, name: `${c.name} Sarees` })));
+        setFormData((prev) => ({ ...prev, categoryId: catList[0].id }));
+      }
+    });
+  }, []);
 
   const handleImageUpload = (file: File | undefined) => {
     if (!file) return;
@@ -140,10 +152,27 @@ export default function NewProductPage() {
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 className="w-full mt-1.5 px-3 py-2 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary"
               >
-                <option value="cat_silk">Silk Sarees</option>
-                <option value="cat_banarasi">Banarasi Sarees</option>
-                <option value="cat_cotton">Cotton Sarees</option>
-                <option value="cat_chanderi">Chanderi Sarees</option>
+                {categories.length > 0 ? (
+                  categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="silk">Silk Sarees</option>
+                    <option value="banarasi">Banarasi Sarees</option>
+                    <option value="kanjivaram">Kanjivaram Sarees</option>
+                    <option value="cotton">Cotton Sarees</option>
+                    <option value="chanderi">Chanderi Sarees</option>
+                    <option value="organza">Organza Sarees</option>
+                    <option value="chiffon">Chiffon Sarees</option>
+                    <option value="georgette">Georgette Sarees</option>
+                    <option value="net">Net Sarees</option>
+                    <option value="designer">Designer Sarees</option>
+                    <option value="bridal">Bridal Sarees</option>
+                  </>
+                )}
               </select>
             </div>
 

@@ -266,6 +266,29 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
 
     const sku = `VRH-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
 
+    // Resolve categoryId to a valid database record ID
+    let finalCategoryId = input.categoryId;
+    const categoryExists = await prisma.category.findUnique({ where: { id: input.categoryId } });
+    if (!categoryExists) {
+      const slugKey = input.categoryId.replace(/^cat_/, "").toLowerCase();
+      const matchedCategory = await prisma.category.findFirst({
+        where: {
+          OR: [
+            { slug: slugKey },
+            { name: { contains: slugKey, mode: "insensitive" } },
+          ],
+        },
+      });
+      if (matchedCategory) {
+        finalCategoryId = matchedCategory.id;
+      } else {
+        const firstCategory = await prisma.category.findFirst({ orderBy: { sortOrder: "asc" } });
+        if (firstCategory) {
+          finalCategoryId = firstCategory.id;
+        }
+      }
+    }
+
     await prisma.product.create({
       data: {
         name: input.name,
@@ -273,7 +296,7 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
         sku,
         description: input.description,
         shortDescription: input.shortDescription,
-        categoryId: input.categoryId,
+        categoryId: finalCategoryId,
         basePrice: input.basePrice,
         salePrice: input.salePrice || null,
         fabric: input.fabric,
