@@ -346,11 +346,11 @@ export async function getFeaturedProducts(limit = 4) {
         category: { select: { name: true, slug: true } },
       },
     });
-    if (res.length > 0) return res;
+    return res;
   } catch (error) {
-    console.warn("Database fallback in getFeaturedProducts:", error);
+    console.warn("Database error in getFeaturedProducts:", error);
+    return [];
   }
-  return FALLBACK_SAREES.filter((s) => s.isFeatured).slice(0, limit) as any;
 }
 
 export async function getTrendingProducts(limit = 4) {
@@ -364,11 +364,11 @@ export async function getTrendingProducts(limit = 4) {
         category: { select: { name: true, slug: true } },
       },
     });
-    if (res.length > 0) return res;
+    return res;
   } catch (error) {
-    console.warn("Database fallback in getTrendingProducts:", error);
+    console.warn("Database error in getTrendingProducts:", error);
+    return [];
   }
-  return FALLBACK_SAREES.filter((s) => s.isTrending).slice(0, limit) as any;
 }
 
 export async function getNewArrivals(limit = 4) {
@@ -403,11 +403,11 @@ export async function getNewArrivals(limit = 4) {
         category: { select: { name: true, slug: true } },
       },
     });
-    if (res.length > 0) return res;
+    return res;
   } catch (error) {
-    console.warn("Database fallback in getNewArrivals:", error);
+    console.warn("Database error in getNewArrivals:", error);
+    return [];
   }
-  return FALLBACK_SAREES.filter((s) => s.isNewArrival).slice(0, limit) as any;
 }
 
 export async function getBestSellers(limit = 4) {
@@ -421,11 +421,11 @@ export async function getBestSellers(limit = 4) {
         category: { select: { name: true, slug: true } },
       },
     });
-    if (res.length > 0) return res;
+    return res;
   } catch (error) {
-    console.warn("Database fallback in getBestSellers:", error);
+    console.warn("Database error in getBestSellers:", error);
+    return [];
   }
-  return FALLBACK_SAREES.filter((s) => s.isBestSeller).slice(0, limit) as any;
 }
 
 /**

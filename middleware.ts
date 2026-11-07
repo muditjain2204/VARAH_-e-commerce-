@@ -1,14 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-// Routes that require authentication
+// Routes that require customer authentication (Clerk)
 const isProtectedRoute = createRouteMatcher([
   "/account(.*)",
   "/checkout(.*)",
-  "/admin(.*)",
 ]);
 
-// Routes that are admin-only
+// Routes that are admin-only (Phone + OTP session)
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
