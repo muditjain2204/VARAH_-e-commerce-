@@ -41,11 +41,16 @@ export default function AdminLoginPage() {
       if (res.success && res.data) {
         setGeneratedOtp(res.data.otp || null);
         setStep("OTP");
-        toast.success("Verification Code Sent!", {
-          description: `Test OTP: ${res.data.otp || "999999"}`,
-        });
+        setOtp(""); // Clear any previous entered OTP so user enters their real SMS code
+
         if (res.data.otp) {
-          setOtp(res.data.otp);
+          toast.success("Demo Code Generated", {
+            description: `Demo OTP: ${res.data.otp} (or master: 999999)`,
+          });
+        } else {
+          toast.success("SMS Code Sent!", {
+            description: `Please check SMS on +91 ${clean} for your 6-digit verification code.`,
+          });
         }
       } else {
         toast.error(res.error || "Failed to send OTP. Try again.");

@@ -52,10 +52,49 @@ export async function sendAdminOtp(phone: string): Promise<{
   console.log(`🔐 [ADMIN AUTH] OTP for ${cleanPhone}: ${otp}`);
   console.log(`==========================================\n`);
 
+  const fast2smsApiKey = process.env.FAST2SMS_API_KEY;
+
+  if (fast2smsApiKey && fast2smsApiKey.trim().length > 5) {
+    try {
+      const response = await fetch("https://www.fast2sms.com/dev/bulkV2", {
+        method: "POST",
+        headers: {
+          authorization: fast2smsApiKey.trim(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          route: "otp",
+          variables_values: otp,
+          numbers: cleanPhone,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Fast2SMS API Response:", data);
+
+      if (!data.return) {
+        console.warn("Fast2SMS warning/error:", data.message);
+      }
+    } catch (smsError) {
+      console.error("Fast2SMS dispatch error:", smsError);
+    }
+
+    // In live SMS mode, do NOT send OTP back to client for security
+    return {
+      success: true,
+      message: `SMS Verification code sent to +91 ${cleanPhone}.`,
+    };
+  }
+
+  // If Fast2SMS is not yet configured, return OTP only in dev mode for testing
+  const isDev = process.env.NODE_ENV !== "production";
+
   return {
     success: true,
-    otp, // Returned to client for instant testing/demo without requiring paid SMS gateway
-    message: `Verification code sent to +91 ${cleanPhone}.`,
+    otp: isDev ? otp : undefined,
+    message: isDev
+      ? `[Demo Mode] Code generated for +91 ${cleanPhone}.`
+      : `Verification code sent to +91 ${cleanPhone}.`,
   };
 }
 
