@@ -206,25 +206,35 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
       }
     }
 
-    await prisma.product.create({
+    const finalImageUrl =
+      input.imageUrl && input.imageUrl.trim().length > 0
+        ? input.imageUrl
+        : "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80";
+
+    const finalDescription =
+      input.description && input.description.trim().length > 0
+        ? input.description
+        : "Handcrafted saree woven with authentic traditional artisan techniques.";
+
+    const createdProduct = await prisma.product.create({
       data: {
         name: input.name,
         slug: `${slug}-${Date.now().toString().slice(-4)}`,
         sku,
-        description: input.description,
-        shortDescription: input.shortDescription,
+        description: finalDescription,
+        shortDescription: input.shortDescription || finalDescription.slice(0, 150),
         categoryId: finalCategoryId,
         basePrice: input.basePrice,
         salePrice: input.salePrice || null,
-        fabric: input.fabric,
-        occasion: input.occasion,
-        color: input.color,
-        availabilityTag: input.availabilityTag,
+        fabric: input.fabric || "Silk",
+        occasion: input.occasion || "Festive",
+        color: input.color || "Red",
+        availabilityTag: input.availabilityTag || "IN_STOCK",
         isActive: input.availabilityTag !== "OUT_OF_STOCK",
         images: {
           create: [
             {
-              url: input.imageUrl,
+              url: finalImageUrl,
               publicId: `img_${Date.now()}`,
               isPrimary: true,
             },
@@ -235,24 +245,31 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
             {
               name: "Standard Free Size",
               sku: `${sku}-STD`,
-              color: input.color,
+              color: input.color || "Standard",
               inventory: {
                 create: {
-                  quantity: input.stockQuantity,
+                  quantity: input.stockQuantity || 10,
                 },
               },
             },
           ],
         },
       },
+      include: {
+        category: true,
+        images: true,
+        variants: { include: { inventory: true } },
+      },
     });
 
     revalidatePath("/products");
     revalidatePath("/admin/products");
+    revalidatePath("/");
     return { success: true, data: true };
   } catch (e: unknown) {
-    console.warn("Database create product fallback:", e);
-    return { success: true, data: true };
+    console.error("Database create product error:", e);
+    const msg = e instanceof Error ? e.message : "Failed to create product in database";
+    return { success: false, error: msg };
   }
 }
 

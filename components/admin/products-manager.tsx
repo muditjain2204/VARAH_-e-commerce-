@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Package,
   Plus,
@@ -86,6 +88,7 @@ export function ProductsManager({
   initialProducts,
   categories,
 }: ProductsManagerProps) {
+  const router = useRouter();
   const [products, setProducts] = useState<AdminProduct[]>(initialProducts);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
@@ -110,18 +113,24 @@ export function ProductsManager({
   const [isCreating, setIsCreating] = useState(false);
   const [uploadedImagePreview, setUploadedImagePreview] = useState<string | null>(null);
   const [newProductData, setNewProductData] = useState<CreateProductInput>({
-    name: "",
-    description: "",
+    name: "Pure Banarasi Silk Zari Saree",
+    description: "Exquisite handcrafted saree woven with pure silk threads and traditional gold zari motifs.",
     categoryId: categories[0]?.id || "",
-    basePrice: 4999,
-    salePrice: 4499,
+    basePrice: 5999,
+    salePrice: 4999,
     fabric: "Pure Silk",
-    occasion: "Festive",
+    occasion: "Festive & Wedding",
     color: "Crimson Red",
     availabilityTag: "IN_STOCK",
     imageUrl: PRESET_IMAGES[0].url,
     stockQuantity: 15,
   });
+
+  useEffect(() => {
+    if (categories.length > 0 && !newProductData.categoryId) {
+      setNewProductData((prev) => ({ ...prev, categoryId: categories[0].id }));
+    }
+  }, [categories, newProductData.categoryId]);
 
   // Filtered Products
   const filteredProducts = products.filter((p) => {
@@ -240,18 +249,47 @@ export function ProductsManager({
   const handleProductImageUpload = (file: File | undefined) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+      toast.error("Please select an image file (PNG, JPG, WebP)");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be smaller than 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image must be smaller than 10MB");
       return;
     }
+
     const reader = new FileReader();
-    reader.onload = () => {
-      const url = String(reader.result);
-      setUploadedImagePreview(url);
-      setNewProductData((current) => ({ ...current, imageUrl: url }));
+    reader.onload = (e) => {
+      const img = document.createElement("img");
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 900;
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.84);
+        setUploadedImagePreview(compressedDataUrl);
+        setNewProductData((current) => ({ ...current, imageUrl: compressedDataUrl }));
+        toast.success("Photo optimized and selected!");
+      };
+      img.src = String(e.target?.result);
     };
     reader.readAsDataURL(file);
   };
@@ -300,6 +338,7 @@ export function ProductsManager({
         };
         setProducts([createdSaree, ...products]);
         setIsAddModalOpen(false);
+        router.refresh();
       } else {
         toast.error(res.error || "Failed to create product");
       }
@@ -715,259 +754,311 @@ export function ProductsManager({
 
       {/* MODAL 3: Add New Saree */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-card border border-border w-full max-w-lg rounded-2xl p-6 shadow-2xl my-8 space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h2 className="text-xl font-bold font-playfair text-foreground">
-                Add New Handcrafted Saree
-              </h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-3 sm:p-6 overflow-hidden animate-in fade-in duration-200">
+          <div className="bg-card border border-border w-full max-w-2xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+            {/* Modal Header (Fixed at top) */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card shrink-0">
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold font-playfair text-foreground">
+                  Add New Handcrafted Saree
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Fill in the details below to list a new saree in your store catalog.
+                </p>
+              </div>
               <button
+                type="button"
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                title="Close"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateProduct} className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-foreground">
-                  Saree Title <span className="text-destructive">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Royal Maroon Velvet Zari Saree"
-                  value={newProductData.name}
-                  onChange={(e) =>
-                    setNewProductData({ ...newProductData, name: e.target.value })
-                  }
-                  className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
+            {/* Modal Form */}
+            <form onSubmit={handleCreateProduct} className="flex flex-col flex-1 overflow-hidden">
+              {/* Scrollable Form Content */}
+              <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
                 <div>
                   <label className="text-xs font-semibold text-foreground">
-                    Category <span className="text-destructive">*</span>
-                  </label>
-                  <select
-                    value={newProductData.categoryId}
-                    onChange={(e) =>
-                      setNewProductData({
-                        ...newProductData,
-                        categoryId: e.target.value,
-                      })
-                    }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="text-xs font-semibold text-foreground">
-                    Availability Tag
-                  </label>
-                  <select
-                    value={newProductData.availabilityTag}
-                    onChange={(e) =>
-                      setNewProductData({
-                        ...newProductData,
-                        availabilityTag: e.target.value as any,
-                      })
-                    }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                  >
-                    <option value="IN_STOCK">In Stock</option>
-                    <option value="UPCOMING">Upcoming</option>
-                    <option value="OUT_OF_STOCK">Out of Stock</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-foreground">Fabric</label>
-                  <input
-                    type="text"
-                    value={newProductData.fabric}
-                    onChange={(e) =>
-                      setNewProductData({ ...newProductData, fabric: e.target.value })
-                    }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-foreground">Occasion</label>
-                  <input
-                    type="text"
-                    value={newProductData.occasion}
-                    onChange={(e) =>
-                      setNewProductData({
-                        ...newProductData,
-                        occasion: e.target.value,
-                      })
-                    }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-foreground">Color</label>
-                  <input
-                    type="text"
-                    value={newProductData.color}
-                    onChange={(e) =>
-                      setNewProductData({ ...newProductData, color: e.target.value })
-                    }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-foreground">
-                    Base Price (₹) <span className="text-destructive">*</span>
+                    Saree Title <span className="text-destructive">*</span>
                   </label>
                   <input
-                    type="number"
-                    min="1"
+                    type="text"
                     required
-                    value={newProductData.basePrice}
+                    placeholder="e.g. Royal Maroon Velvet Zari Saree"
+                    value={newProductData.name}
                     onChange={(e) =>
-                      setNewProductData({
-                        ...newProductData,
-                        basePrice: parseFloat(e.target.value) || 0,
-                      })
+                      setNewProductData({ ...newProductData, name: e.target.value })
                     }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
+                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   />
                 </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">
+                      Category <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      value={newProductData.categoryId}
+                      onChange={(e) =>
+                        setNewProductData({
+                          ...newProductData,
+                          categoryId: e.target.value,
+                        })
+                      }
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    >
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">
+                      Availability Tag
+                    </label>
+                    <select
+                      value={newProductData.availabilityTag}
+                      onChange={(e) =>
+                        setNewProductData({
+                          ...newProductData,
+                          availabilityTag: e.target.value as any,
+                        })
+                      }
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    >
+                      <option value="IN_STOCK">In Stock</option>
+                      <option value="UPCOMING">Upcoming</option>
+                      <option value="OUT_OF_STOCK">Out of Stock</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">Fabric</label>
+                    <input
+                      type="text"
+                      value={newProductData.fabric || ""}
+                      onChange={(e) =>
+                        setNewProductData({ ...newProductData, fabric: e.target.value })
+                      }
+                      placeholder="e.g. Pure Silk"
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">Occasion</label>
+                    <input
+                      type="text"
+                      value={newProductData.occasion || ""}
+                      onChange={(e) =>
+                        setNewProductData({
+                          ...newProductData,
+                          occasion: e.target.value,
+                        })
+                      }
+                      placeholder="e.g. Wedding"
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">Color</label>
+                    <input
+                      type="text"
+                      value={newProductData.color || ""}
+                      onChange={(e) =>
+                        setNewProductData({ ...newProductData, color: e.target.value })
+                      }
+                      placeholder="e.g. Maroon"
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">
+                      Base Price (₹) <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      required
+                      value={newProductData.basePrice}
+                      onChange={(e) =>
+                        setNewProductData({
+                          ...newProductData,
+                          basePrice: parseFloat(e.target.value) || 0,
+                        })
+                      }
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">
+                      Sale Price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="Discounted"
+                      value={newProductData.salePrice || ""}
+                      onChange={(e) =>
+                        setNewProductData({
+                          ...newProductData,
+                          salePrice: e.target.value ? parseFloat(e.target.value) : null,
+                        })
+                      }
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-foreground">
+                      Stock Units
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={newProductData.stockQuantity}
+                      onChange={(e) =>
+                        setNewProductData({
+                          ...newProductData,
+                          stockQuantity: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Preset Saree Photos */}
+                <div>
+                  <label className="text-xs font-semibold text-foreground block mb-1.5">
+                    Choose Photo (Preset or Upload Custom)
+                  </label>
+                  <div className="grid grid-cols-4 gap-2.5">
+                    {PRESET_IMAGES.map((img) => {
+                      const isSelected = newProductData.imageUrl === img.url;
+                      return (
+                        <button
+                          key={img.label}
+                          type="button"
+                          onClick={() => {
+                            setUploadedImagePreview(null);
+                            setNewProductData({
+                              ...newProductData,
+                              imageUrl: img.url,
+                            });
+                          }}
+                          className={`relative rounded-xl overflow-hidden border-2 aspect-[3/4] transition-all group ${
+                            isSelected
+                              ? "border-primary ring-2 ring-primary/30 scale-105 shadow-md"
+                              : "border-border hover:border-foreground/40 opacity-75 hover:opacity-100"
+                          }`}
+                        >
+                          <Image
+                            src={img.url}
+                            alt={img.label}
+                            fill
+                            className="object-cover"
+                            sizes="120px"
+                          />
+                          <span className="absolute bottom-0 inset-x-0 bg-black/70 text-[9px] font-medium text-white py-1 text-center truncate px-1">
+                            {img.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Custom Photo Upload */}
+                <div className="space-y-2 pt-1 border-t border-border/60">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-foreground">
+                      Or Upload Saree Photo from Device
+                    </label>
+                    <span className="text-[10px] text-muted-foreground">Auto-compressed</span>
+                  </div>
+                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border px-4 py-3 text-xs font-medium hover:border-primary hover:bg-muted/30 transition-colors">
+                    <UploadCloud className="h-4 w-4 text-primary" />
+                    <span>Click to choose photo from computer or phone</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(event) => handleProductImageUpload(event.target.files?.[0])}
+                    />
+                  </label>
+                  {uploadedImagePreview && (
+                    <div className="flex items-center gap-3 p-2 bg-muted/40 rounded-xl border border-border">
+                      <Image
+                        src={uploadedImagePreview}
+                        alt="Uploaded saree preview"
+                        width={60}
+                        height={80}
+                        className="rounded-lg border border-border object-cover"
+                      />
+                      <div className="text-xs">
+                        <p className="font-semibold text-emerald-600">✓ Photo attached successfully</p>
+                        <p className="text-[11px] text-muted-foreground">Ready to publish to store</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Saree Description */}
                 <div>
                   <label className="text-xs font-semibold text-foreground">
-                    Sale Price (₹)
+                    Description
                   </label>
-                  <input
-                    type="number"
-                    min="1"
-                    placeholder="Optional"
-                    value={newProductData.salePrice || ""}
+                  <textarea
+                    rows={2}
+                    placeholder="Details regarding weave, zari type, craftsmanship..."
+                    value={newProductData.description}
                     onChange={(e) =>
                       setNewProductData({
                         ...newProductData,
-                        salePrice: e.target.value ? parseFloat(e.target.value) : null,
+                        description: e.target.value,
                       })
                     }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-foreground">
-                    Stock Units
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={newProductData.stockQuantity}
-                    onChange={(e) =>
-                      setNewProductData({
-                        ...newProductData,
-                        stockQuantity: parseInt(e.target.value) || 0,
-                      })
-                    }
-                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
+                    className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   />
                 </div>
               </div>
 
-              {/* Preset Image Picker */}
-              <div>
-                <label className="text-xs font-semibold text-foreground block mb-1">
-                  Preset Saree Imagery
-                </label>
-                <div className="grid grid-cols-4 gap-2">
-                  {PRESET_IMAGES.map((img) => {
-                    const isSelected = newProductData.imageUrl === img.url;
-                    return (
-                      <button
-                        key={img.label}
-                        type="button"
-                        onClick={() =>
-                          setNewProductData({
-                            ...newProductData,
-                            imageUrl: img.url,
-                          })
-                        }
-                        className={`relative rounded-lg overflow-hidden border-2 aspect-[3/4] transition-all ${
-                          isSelected
-                            ? "border-primary ring-2 ring-primary/20 scale-105"
-                            : "border-border hover:border-foreground/30 opacity-70 hover:opacity-100"
-                        }`}
-                      >
-                        <Image
-                          src={img.url}
-                          alt={img.label}
-                          fill
-                          className="object-cover"
-                          sizes="80px"
-                        />
-                        <span className="absolute bottom-0 inset-x-0 bg-black/60 text-[9px] text-white py-0.5 text-center truncate px-1">
-                          {img.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-foreground">Upload custom image (max 5MB)</label>
-                <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border px-3 py-4 text-xs font-semibold hover:border-primary">
-                  <UploadCloud className="h-4 w-4" /> Choose image file
-                  <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(event) => handleProductImageUpload(event.target.files?.[0])} />
-                </label>
-                {uploadedImagePreview && <Image src={uploadedImagePreview} alt="Uploaded saree preview" width={72} height={92} className="rounded-lg border border-border object-cover" />}
-                <input type="url" value={newProductData.imageUrl} onChange={(event) => { setUploadedImagePreview(null); setNewProductData({ ...newProductData, imageUrl: event.target.value }); }} placeholder="Or paste an image URL" className="w-full px-3 py-2 text-xs rounded-lg border border-border bg-background font-mono" />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-foreground">
-                  Description
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="Details regarding weave, zari type, craftsmanship..."
-                  value={newProductData.description}
-                  onChange={(e) =>
-                    setNewProductData({
-                      ...newProductData,
-                      description: e.target.value,
-                    })
-                  }
-                  className="w-full mt-1 px-3 py-2 text-sm rounded-lg border border-border bg-background"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-3 border-t border-border">
-                <button
-                  type="button"
+              {/* Modal Footer (Fixed at bottom) */}
+              <div className="flex items-center justify-between px-6 py-3.5 border-t border-border bg-muted/40 shrink-0">
+                <Link
+                  href="/admin/products/new"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground"
+                  className="text-xs text-primary hover:underline font-medium"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isCreating}
-                  className="px-5 py-2 text-xs font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 shadow-sm"
-                >
-                  {isCreating ? "Publishing..." : "Publish Saree to Catalog"}
-                </button>
+                  Full Page View ↗
+                </Link>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddModalOpen(false)}
+                    className="px-4 py-2 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isCreating}
+                    className="px-6 py-2.5 text-xs font-bold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all shadow-md active:scale-95 disabled:opacity-50"
+                  >
+                    {isCreating ? "Publishing Saree..." : "✓ Publish Saree to Store"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>
