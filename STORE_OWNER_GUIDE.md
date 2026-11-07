@@ -1,11 +1,9 @@
 # 🛍️ MAA LAXMI Store Owner’s Manual
 *A simple, non-technical guide to managing sarees, tracking orders, and receiving payments.*
-
 ---
-
 ## 1. How to Log in to Your Store Manager
-
 Your website has a private, secure Admin Portal built for you. You can open it on your **phone, tablet, or laptop**:
+
 
 1. Open your browser and go to:
    👉 **`https://maalaxmistore.vercel.app/admin/login`**
@@ -70,3 +68,4 @@ When a customer buys a saree:
   1. The money is securely processed by **Razorpay**.
   2. Razorpay automatically transfers the money **directly into your verified bank account** (typically the next business day).
   3. You can log in to **[dashboard.razorpay.com](https://dashboard.razorpay.com)** anytime to view your daily settlement amounts and bank statements.
+

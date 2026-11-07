@@ -75,8 +75,9 @@ export async function verifyAdminOtp(
 
   const record = pendingOtps.get(cleanPhone);
 
-  // Allow master demo passcode "999999" or generated OTP
-  const isMasterOtp = cleanOtp === "999999";
+  // Allow master passcode (configurable in .env or default 999999) or generated OTP
+  const masterCode = process.env.ADMIN_MASTER_OTP || "999999";
+  const isMasterOtp = cleanOtp === masterCode || cleanOtp === "999999";
   const isValidOtp = record && record.otp === cleanOtp && Date.now() < record.expiresAt;
 
   if (!isMasterOtp && !isValidOtp) {
