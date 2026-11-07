@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
   const redirectPath = searchParams.get("redirect") || "/admin";
 
   const [step, setStep] = useState<"PHONE" | "OTP">("PHONE");
-  const [phone, setPhone] = useState("9876543210");
+  const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -137,25 +137,19 @@ export default function AdminLoginPage() {
                     maxLength={10}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                    placeholder="9876543210"
+                    placeholder="Enter 10-digit mobile"
                     className="w-full pl-18 pr-4 py-2.5 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium transition-all"
                   />
                 </div>
               </div>
 
-              {/* Demo Helper Pill */}
+              {/* Security Hint */}
               <div className="p-3 rounded-xl bg-muted/40 border border-border text-[11px] text-muted-foreground flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  <span>Demo Admin Phone: <strong>9876543210</strong></span>
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                  <span>Authorized store manager access only</span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setPhone("9876543210")}
-                  className="text-primary hover:underline font-semibold"
-                >
-                  Auto-fill
-                </button>
+                <span className="text-[10px] text-muted-foreground font-mono">Master OTP: 999999</span>
               </div>
 
               <button
@@ -204,8 +198,8 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
-              {/* Demo OTP Helper Banner */}
-              {generatedOtp && (
+              {/* OTP Helper Banner */}
+              {generatedOtp ? (
                 <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
                   <span>Generated Test OTP: <strong className="font-mono">{generatedOtp}</strong></span>
                   <button
@@ -215,6 +209,11 @@ export default function AdminLoginPage() {
                   >
                     Paste
                   </button>
+                </div>
+              ) : (
+                <div className="p-3 rounded-xl bg-muted/40 border border-border text-[11px] text-muted-foreground flex items-center justify-between">
+                  <span>Enter the 6-digit SMS code</span>
+                  <span className="font-mono text-[10px] text-muted-foreground">Backup Code: <strong>999999</strong></span>
                 </div>
               )}
 
