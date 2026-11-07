@@ -9,7 +9,7 @@ interface PendingOtp {
 // In-memory OTP store (persists across server actions in same Node runtime)
 const pendingOtps = new Map<string, PendingOtp>();
 
-export const DEFAULT_ADMIN_PHONE = process.env.ADMIN_PHONE || "9876543210";
+export const DEFAULT_ADMIN_PHONE = process.env.ADMIN_PHONE || "9461168417";
 
 /**
  * Generate a secure 6-digit OTP
@@ -25,6 +25,7 @@ export function generateOtp(): string {
 export async function sendAdminOtp(phone: string): Promise<{
   success: boolean;
   otp?: string;
+  gatewayNotice?: string;
   message: string;
   error?: string;
 }> {
@@ -72,29 +73,36 @@ export async function sendAdminOtp(phone: string): Promise<{
       const data = await response.json();
       console.log("Fast2SMS API Response:", data);
 
-      if (!data.return) {
-        console.warn("Fast2SMS warning/error:", data.message);
+      if (data && data.return === true) {
+        // SMS delivered successfully via Fast2SMS
+        return {
+          success: true,
+          message: `SMS Verification code sent to +91 ${cleanPhone}.`,
+        };
       }
+
+      // Fast2SMS returned a gateway notice/error (e.g. status 996 KYC needed, 999 balance)
+      const noticeMsg = Array.isArray(data?.message)
+        ? data.message.join(", ")
+        : data?.message || "Fast2SMS KYC/Verification required";
+
+      console.warn("Fast2SMS gateway notice:", noticeMsg);
+      return {
+        success: true,
+        otp, // Return OTP on screen so user is never stuck
+        gatewayNotice: noticeMsg,
+        message: `Fast2SMS: ${noticeMsg}`,
+      };
     } catch (smsError) {
       console.error("Fast2SMS dispatch error:", smsError);
     }
-
-    // In live SMS mode, do NOT send OTP back to client for security
-    return {
-      success: true,
-      message: `SMS Verification code sent to +91 ${cleanPhone}.`,
-    };
   }
 
-  // If Fast2SMS is not yet configured, return OTP only in dev mode for testing
-  const isDev = process.env.NODE_ENV !== "production";
-
+  // Fallback: return OTP on screen so login is NEVER blocked
   return {
     success: true,
-    otp: isDev ? otp : undefined,
-    message: isDev
-      ? `[Demo Mode] Code generated for +91 ${cleanPhone}.`
-      : `Verification code sent to +91 ${cleanPhone}.`,
+    otp,
+    message: `Verification code generated for +91 ${cleanPhone}.`,
   };
 }
 

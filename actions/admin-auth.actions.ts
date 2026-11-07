@@ -10,6 +10,7 @@ export async function requestAdminOtpAction(phone: string): Promise<
   ActionResponse<{
     message: string;
     otp?: string;
+    gatewayNotice?: string;
   }>
 > {
   try {
@@ -26,6 +27,7 @@ export async function requestAdminOtpAction(phone: string): Promise<
       data: {
         message: result.message,
         otp: result.otp,
+        gatewayNotice: result.gatewayNotice,
       },
     };
   } catch (error: unknown) {

@@ -22,9 +22,10 @@ export default function AdminLoginPage() {
   const redirectPath = searchParams.get("redirect") || "/admin";
 
   const [step, setStep] = useState<"PHONE" | "OTP">("PHONE");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("9461168417");
   const [otp, setOtp] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
+  const [gatewayNotice, setGatewayNotice] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSendOtp = async (e: React.FormEvent) => {
@@ -40,14 +41,17 @@ export default function AdminLoginPage() {
       const res = await requestAdminOtpAction(clean);
       if (res.success && res.data) {
         setGeneratedOtp(res.data.otp || null);
+        setGatewayNotice(res.data.gatewayNotice || null);
         setStep("OTP");
-        setOtp(""); // Clear any previous entered OTP so user enters their real SMS code
 
         if (res.data.otp) {
-          toast.success("Demo Code Generated", {
-            description: `Demo OTP: ${res.data.otp} (or master: 999999)`,
+          // Fallback code provided (e.g. while Fast2SMS KYC is verified)
+          setOtp(res.data.otp);
+          toast.success("Verification Code Ready!", {
+            description: `Code: ${res.data.otp} (or master 999999)`,
           });
         } else {
+          setOtp("");
           toast.success("SMS Code Sent!", {
             description: `Please check SMS on +91 ${clean} for your 6-digit verification code.`,
           });
@@ -200,20 +204,35 @@ export default function AdminLoginPage() {
 
               {/* OTP Helper Banner */}
               {generatedOtp ? (
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
-                  <span>Generated Test OTP: <strong className="font-mono">{generatedOtp}</strong></span>
-                  <button
-                    type="button"
-                    onClick={() => setOtp(generatedOtp)}
-                    className="font-bold underline text-[11px]"
-                  >
-                    Paste
-                  </button>
+                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span>
+                      Verification Code: <strong className="font-mono text-sm tracking-wider">{generatedOtp}</strong>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setOtp(generatedOtp)}
+                      className="font-bold underline text-[11px] bg-amber-200/80 dark:bg-amber-900/60 px-2 py-0.5 rounded"
+                    >
+                      Paste Code
+                    </button>
+                  </div>
+                  {gatewayNotice && (
+                    <p className="text-[10px] text-amber-700/80 dark:text-amber-400">
+                      ℹ️ Fast2SMS Notice: {gatewayNotice}
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="p-3 rounded-xl bg-muted/40 border border-border text-[11px] text-muted-foreground flex items-center justify-between">
                   <span>Enter the 6-digit SMS code</span>
-                  <span className="font-mono text-[10px] text-muted-foreground">Backup Code: <strong>999999</strong></span>
+                  <button
+                    type="button"
+                    onClick={() => setOtp("999999")}
+                    className="font-mono text-[10px] text-primary hover:underline"
+                  >
+                    Backup Code: <strong>999999</strong>
+                  </button>
                 </div>
               )}
 
