@@ -120,9 +120,18 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground">
-            © {currentYear} MAA LAXMI. All rights reserved.
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-muted-foreground">
+              © {currentYear} MAA LAXMI. All rights reserved.
+            </p>
+            <span className="text-muted-foreground/40 text-xs">•</span>
+            <Link
+              href="/admin"
+              className="text-xs text-muted-foreground/70 hover:text-foreground transition-colors"
+            >
+              Store Admin
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <span className="text-xs text-muted-foreground">
               We accept:

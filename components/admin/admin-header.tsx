@@ -18,7 +18,7 @@ interface AdminHeaderProps {
   adminPhone?: string;
 }
 
-export function AdminHeader({ adminPhone = "9876543210" }: AdminHeaderProps) {
+export function AdminHeader({}: AdminHeaderProps) {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -26,8 +26,8 @@ export function AdminHeader({ adminPhone = "9876543210" }: AdminHeaderProps) {
     setIsLoggingOut(true);
     try {
       await exitAdminModeAction();
-      toast.success("Exited Admin Mode", {
-        description: "Admin session locked. Phone + OTP will be required to re-enter.",
+      toast.success("Admin Session Locked", {
+        description: "Secret passcode will be required to re-enter.",
       });
       router.push("/admin/login");
       router.refresh();
@@ -59,13 +59,10 @@ export function AdminHeader({ adminPhone = "9876543210" }: AdminHeaderProps) {
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Admin Profile Info */}
           <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-muted/60 border border-border text-xs">
-            <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-[10px]">
-              A
+            <div className="w-5 h-5 rounded-full bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-[10px]">
+              ✓
             </div>
-            <div className="flex items-center gap-1 text-muted-foreground">
-              <Phone className="h-3 w-3" />
-              <span className="font-mono font-medium text-foreground">+91 {adminPhone}</span>
-            </div>
+            <span className="font-medium text-foreground">Passcode Verified</span>
           </div>
 
           {/* Switch to Buyer Mode */}

@@ -4,13 +4,13 @@
 ## 1. How to Log in to Your Store Manager
 Your website has a private, secure Admin Portal built for you. You can open it on your **phone, tablet, or laptop**:
 
-
 1. Open your browser and go to:
-   👉 **`https://maalaxmistore.vercel.app/admin/login`**
-2. Enter your registered mobile number: **`9876543210`** *(or your mobile number)*.
-3. Click **"Request Admin OTP"**.
-4. Enter the verification code shown on screen (or master passcode **`999999`**).
-5. You are now inside your store management dashboard!
+   👉 **`https://maalaxmistore.vercel.app/admin`** *(or click "Store Admin" in the website footer)*.
+2. Enter your secret Store Passcode:
+   👉 **`MAALAXMI@2026`**
+3. Click **"Unlock Admin Portal"**.
+4. You are now inside your store management dashboard!
+*Your session stays active securely for 7 days so you do not have to keep retyping it unless you click "Exit Admin".*
 
 ---
 

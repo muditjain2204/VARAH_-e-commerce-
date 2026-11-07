@@ -5,15 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ShieldCheck,
-  Phone,
-  KeyRound,
+  Lock,
   ArrowRight,
   ArrowLeft,
-  Lock,
+  KeyRound,
+  Eye,
+  EyeOff,
   Sparkles,
-  RotateCcw,
 } from "lucide-react";
-import { requestAdminOtpAction, verifyAdminOtpAction } from "@/actions/admin-auth.actions";
+import { verifyAdminPasscodeAction } from "@/actions/admin-auth.actions";
 import { toast } from "sonner";
 
 export default function AdminLoginPage() {
@@ -21,73 +21,31 @@ export default function AdminLoginPage() {
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get("redirect") || "/admin";
 
-  const [step, setStep] = useState<"PHONE" | "OTP">("PHONE");
-  const [phone, setPhone] = useState("9461168417");
-  const [otp, setOtp] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
-  const [gatewayNotice, setGatewayNotice] = useState<string | null>(null);
+  const [passcode, setPasscode] = useState("");
+  const [showPasscode, setShowPasscode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = phone.replace(/\D/g, "");
-    if (clean.length !== 10) {
-      toast.error("Please enter a valid 10-digit Indian mobile number");
+    if (!passcode.trim()) {
+      toast.error("Please enter the admin secret code");
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await requestAdminOtpAction(clean);
-      if (res.success && res.data) {
-        setGeneratedOtp(res.data.otp || null);
-        setGatewayNotice(res.data.gatewayNotice || null);
-        setStep("OTP");
-
-        if (res.data.otp) {
-          // Fallback code provided (e.g. while Fast2SMS KYC is verified)
-          setOtp(res.data.otp);
-          toast.success("Verification Code Ready!", {
-            description: `Code: ${res.data.otp} (or master 999999)`,
-          });
-        } else {
-          setOtp("");
-          toast.success("SMS Code Sent!", {
-            description: `Please check SMS on +91 ${clean} for your 6-digit verification code.`,
-          });
-        }
-      } else {
-        toast.error(res.error || "Failed to send OTP. Try again.");
-      }
-    } catch {
-      toast.error("Network error sending OTP");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.trim().length !== 6) {
-      toast.error("Please enter the 6-digit OTP");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const cleanPhone = phone.replace(/\D/g, "");
-      const res = await verifyAdminOtpAction(cleanPhone, otp.trim());
+      const res = await verifyAdminPasscodeAction(passcode.trim());
       if (res.success) {
-        toast.success("Admin Identity Verified!", {
-          description: "Welcome to Varah Store Management Portal.",
+        toast.success("Admin Portal Unlocked!", {
+          description: "Welcome back to Maa Laxmi Management Console.",
         });
         router.push(redirectPath);
         router.refresh();
       } else {
-        toast.error(res.error || "Invalid OTP code");
+        toast.error(res.error || "Incorrect secret access code");
       }
     } catch {
-      toast.error("Verification failed");
+      toast.error("Error unlocking admin portal");
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +53,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-gradient-to-b from-background via-muted/20 to-background p-4 md:p-8">
-      {/* Top Brand */}
+      {/* Top Brand Header */}
       <div className="flex items-center justify-between max-w-md w-full mx-auto">
         <Link href="/" className="font-playfair text-xl font-bold text-foreground">
           MAA LAXMI <span className="text-xs font-sans font-normal text-muted-foreground">Admin Portal</span>
@@ -105,174 +63,105 @@ export default function AdminLoginPage() {
           className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Back to Store (Buyer Mode)</span>
+          <span>Back to Store</span>
         </Link>
       </div>
 
-      {/* Main Card */}
-      <div className="max-w-md w-full mx-auto my-8">
-        <div className="p-7 md:p-8 rounded-3xl border border-border bg-card shadow-xl space-y-6">
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center border border-amber-500/20 shadow-inner">
-              <Lock className="w-8 h-8" />
+      {/* Main Lock Card */}
+      <div className="w-full max-w-md mx-auto my-auto">
+        <div className="bg-card border border-border/80 rounded-2xl shadow-xl p-6 sm:p-8 backdrop-blur">
+          {/* Security Icon & Header */}
+          <div className="text-center space-y-2 mb-6">
+            <div className="inline-flex p-3 rounded-2xl bg-primary/10 border border-primary/20 text-primary mb-2 shadow-inner">
+              <ShieldCheck className="h-7 w-7" />
             </div>
-            <h1 className="font-playfair text-2xl font-bold text-foreground">
-              Admin Verification
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground font-playfair tracking-tight">
+              Store Owner Portal
             </h1>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto">
-              Buyer accounts cannot access admin controls. Provide your registered phone number & OTP to verify store management access.
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto">
+              Restricted management area. Enter your secret passcode to access inventory, orders & product controls.
             </p>
           </div>
 
-          {step === "PHONE" ? (
-            <form onSubmit={handleSendOtp} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-foreground flex items-center justify-between">
-                  <span>Admin Mobile Number</span>
-                  <span className="text-[10px] text-muted-foreground">OTP Protected</span>
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-3 text-sm text-muted-foreground font-semibold flex items-center gap-1">
-                    🇮🇳 +91
-                  </span>
-                  <input
-                    type="tel"
-                    required
-                    maxLength={10}
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                    placeholder="Enter 10-digit mobile"
-                    className="w-full pl-18 pr-4 py-2.5 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium transition-all"
-                  />
-                </div>
-              </div>
+          {/* Passcode Form */}
+          <form onSubmit={handleUnlock} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span>Secret Admin Passcode</span>
+                <span className="text-[10px] text-muted-foreground">Encrypted Access</span>
+              </label>
 
-              {/* Security Hint */}
-              <div className="p-3 rounded-xl bg-muted/40 border border-border text-[11px] text-muted-foreground flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                  <span>Authorized store manager access only</span>
-                </span>
-                <span className="text-[10px] text-muted-foreground font-mono">Master OTP: 999999</span>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading || phone.length !== 10}
-                className="w-full h-12 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50 text-sm"
-              >
-                {isLoading ? (
-                  <span>Sending Code...</span>
-                ) : (
-                  <>
-                    <span>Send Verification OTP</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-foreground">
-                    Enter 6-Digit OTP
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setStep("PHONE")}
-                    className="text-[11px] text-primary hover:underline"
-                  >
-                    Change Number
-                  </button>
-                </div>
-
-                <div className="relative">
-                  <KeyRound className="absolute left-3.5 top-3 h-4 w-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    autoFocus
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                    placeholder="Enter 6-digit code"
-                    className="w-full pl-10 pr-4 py-2.5 text-center tracking-[0.4em] font-mono text-base font-bold rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* OTP Helper Banner */}
-              {generatedOtp ? (
-                <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span>
-                      Verification Code: <strong className="font-mono text-sm tracking-wider">{generatedOtp}</strong>
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setOtp(generatedOtp)}
-                      className="font-bold underline text-[11px] bg-amber-200/80 dark:bg-amber-900/60 px-2 py-0.5 rounded"
-                    >
-                      Paste Code
-                    </button>
-                  </div>
-                  {gatewayNotice && (
-                    <p className="text-[10px] text-amber-700/80 dark:text-amber-400">
-                      ℹ️ Fast2SMS Notice: {gatewayNotice}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="p-3 rounded-xl bg-muted/40 border border-border text-[11px] text-muted-foreground flex items-center justify-between">
-                  <span>Enter the 6-digit SMS code</span>
-                  <button
-                    type="button"
-                    onClick={() => setOtp("999999")}
-                    className="font-mono text-[10px] text-primary hover:underline"
-                  >
-                    Backup Code: <strong>999999</strong>
-                  </button>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={isLoading || otp.length !== 6}
-                className="w-full h-12 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50 text-sm"
-              >
-                {isLoading ? (
-                  <span>Verifying Admin...</span>
-                ) : (
-                  <>
-                    <ShieldCheck className="h-5 w-5" />
-                    <span>Verify & Unlock Admin Portal</span>
-                  </>
-                )}
-              </button>
-
-              <div className="text-center pt-1">
+              <div className="relative">
+                <KeyRound className="absolute left-3.5 top-3 h-4 w-4 text-muted-foreground" />
+                <input
+                  type={showPasscode ? "text" : "password"}
+                  required
+                  autoFocus
+                  value={passcode}
+                  onChange={(e) => setPasscode(e.target.value)}
+                  placeholder="Enter secret code..."
+                  className="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary font-medium tracking-wide transition-all"
+                />
                 <button
                   type="button"
-                  onClick={handleSendOtp}
-                  className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+                  onClick={() => setShowPasscode(!showPasscode)}
+                  className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground p-0.5"
+                  tabIndex={-1}
+                  aria-label={showPasscode ? "Hide code" : "Show code"}
                 >
-                  <RotateCcw className="h-3 w-3" />
-                  <span>Resend OTP</span>
+                  {showPasscode ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
                 </button>
               </div>
-            </form>
-          )}
+            </div>
 
-          <div className="pt-4 border-t border-border text-center text-[11px] text-muted-foreground">
-            🔒 Protected Area • Restricted to authorized store staff and administrators only.
+            {/* Secret Code Quick Assist Pill */}
+            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                <span>Default Passcode: <strong className="font-mono">MAALAXMI@2026</strong></span>
+              </span>
+              <button
+                type="button"
+                onClick={() => setPasscode("MAALAXMI@2026")}
+                className="font-bold underline text-[11px] bg-amber-200/80 dark:bg-amber-900/60 px-2 py-0.5 rounded transition-transform active:scale-95"
+              >
+                Auto-fill
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading || !passcode.trim()}
+              className="w-full h-12 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-md transition-all active:scale-[0.98] disabled:opacity-50 text-sm"
+            >
+              {isLoading ? (
+                <span>Verifying Secret Code...</span>
+              ) : (
+                <>
+                  <Lock className="h-4 w-4" />
+                  <span>Unlock Admin Portal</span>
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Privacy Note */}
+          <div className="mt-6 pt-4 border-t border-border/60 text-center">
+            <p className="text-[11px] text-muted-foreground">
+              Only authorized personnel. Changes made here directly reflect on live store catalog and customer orders.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Footer link */}
-      <div className="text-center text-xs text-muted-foreground">
-        Varah Saree Store © 2026. Handcrafted in Varanasi.
+      {/* Footer Info */}
+      <div className="text-center text-xs text-muted-foreground py-2">
+        <p>© {new Date().getFullYear()} Maa Laxmi Sarees — Administrative Security</p>
       </div>
     </div>
   );
