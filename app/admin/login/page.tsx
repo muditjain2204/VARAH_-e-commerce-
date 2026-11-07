@@ -11,7 +11,6 @@ import {
   KeyRound,
   Eye,
   EyeOff,
-  Sparkles,
 } from "lucide-react";
 import { verifyAdminPasscodeAction } from "@/actions/admin-auth.actions";
 import { toast } from "sonner";
@@ -116,21 +115,6 @@ export default function AdminLoginPage() {
                   )}
                 </button>
               </div>
-            </div>
-
-            {/* Secret Code Quick Assist Pill */}
-            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between">
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
-                <span>Default Passcode: <strong className="font-mono">MAALAXMI@2026</strong></span>
-              </span>
-              <button
-                type="button"
-                onClick={() => setPasscode("MAALAXMI@2026")}
-                className="font-bold underline text-[11px] bg-amber-200/80 dark:bg-amber-900/60 px-2 py-0.5 rounded transition-transform active:scale-95"
-              >
-                Auto-fill
-              </button>
             </div>
 
             <button

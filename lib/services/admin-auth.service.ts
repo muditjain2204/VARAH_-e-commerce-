@@ -29,7 +29,6 @@ export async function verifyAdminPasscode(
     configuredSecret,
     "MAALAXMI@2026",
     "varah@admin2026",
-    "999999",
   ];
 
   const isValid = allowedSecrets.includes(cleanCode);
