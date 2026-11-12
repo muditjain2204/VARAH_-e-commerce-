@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronRight, Heart, Share2, ShoppingCart, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { getProductBySlug, getRelatedProducts } from "@/lib/services/product.service";
 import { formatPrice, getDiscountPercentage } from "@/lib/utils";
-import { ProductCard, ProductDetailActions } from "@/components/store";
+import { ProductCard, ProductDetailActions, ProductGallery } from "@/components/store";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -115,53 +115,16 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         </nav>
 
         {/* Product section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Image gallery */}
-          <div className="space-y-3">
-            {/* Primary image */}
-            <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-secondary">
-              {primaryImage ? (
-                <Image
-                  src={primaryImage.url}
-                  alt={primaryImage.alt || product.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  priority
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/30">
-                  <span className="text-8xl">🪷</span>
-                </div>
-              )}
-              {discount > 0 && (
-                <span className="absolute top-4 left-4 px-3 py-1 bg-destructive text-destructive-foreground text-sm font-semibold rounded-lg">
-                  {discount}% OFF
-                </span>
-              )}
-            </div>
-
-            {/* Thumbnails */}
-            {product.images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-1">
-                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                {product.images.map((img: any, i: number) => (
-                  <div
-                    key={img.id}
-                    className="relative w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden border-2 border-border hover:border-primary transition-colors cursor-pointer"
-                  >
-                    <Image
-                      src={img.url}
-                      alt={img.alt || `${product.name} - Image ${i + 1}`}
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <ProductGallery
+            images={product.images.map((img: any) => ({
+              url: img.url,
+              alt: img.alt || product.name,
+            }))}
+            productName={product.name}
+            discount={discount}
+          />
 
           {/* Product info */}
           <div className="space-y-6">

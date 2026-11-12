@@ -156,14 +156,14 @@ export default function CartPage() {
                 {/* Thumbnail */}
                 <Link
                   href={`/products/${item.slug}`}
-                  className="relative w-24 sm:w-28 aspect-[3/4] flex-shrink-0 rounded-xl overflow-hidden bg-secondary border border-border"
+                  className="relative w-20 sm:w-24 aspect-[3/4] flex-shrink-0 rounded-xl overflow-hidden bg-muted/20 border border-border"
                 >
                   <Image
                     src={item.image}
                     alt={item.name}
                     fill
-                    className="object-cover hover:scale-105 transition-transform"
-                    sizes="112px"
+                    className="object-contain p-1 hover:scale-105 transition-transform"
+                    sizes="96px"
                   />
                 </Link>
 
