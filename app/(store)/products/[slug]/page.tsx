@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronRight, Heart, Share2, ShoppingCart, Truck, ShieldCheck, RotateCcw } from "lucide-react";
+import { ChevronRight, Truck, ShieldCheck, RotateCcw } from "lucide-react";
 import { getProductBySlug, getRelatedProducts } from "@/lib/services/product.service";
-import { formatPrice, getDiscountPercentage } from "@/lib/utils";
+import { getDiscountPercentage } from "@/lib/utils";
 import { ProductCard, ProductDetailActions, ProductGallery } from "@/components/store";
 
 interface ProductPageProps {
@@ -118,6 +118,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           {/* Image gallery */}
           <ProductGallery
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             images={product.images.map((img: any) => ({
               url: img.url,
               alt: img.alt || product.name,
@@ -157,26 +158,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               </div>
             )}
 
-            {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-foreground">
-                {formatPrice(salePrice || basePrice)}
-              </span>
-              {salePrice && (
-                <>
-                  <span className="text-lg text-muted-foreground line-through">
-                    {formatPrice(basePrice)}
-                  </span>
-                  <span className="text-sm font-semibold text-emerald-600">
-                    Save {formatPrice(basePrice - salePrice)}
-                  </span>
-                </>
-              )}
-            </div>
-
-            <p className="text-xs text-muted-foreground">Inclusive of all taxes</p>
-
-            {/* Interactive Actions & Variant Selection */}
+            {/* Interactive Actions, Dynamic Real-Time Price & Variant Selection */}
             <ProductDetailActions
               product={{
                 id: product.id,

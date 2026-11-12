@@ -6,6 +6,7 @@ import { ShoppingCart, Heart, Share2, Zap, Check, MapPin, Truck, MessageCircle }
 import { useCart } from "@/components/providers/cart-provider";
 import { useWishlist } from "@/components/providers/wishlist-provider";
 import { toast } from "sonner";
+import { formatPrice } from "@/lib/utils";
 
 interface Variant {
   id: string;
@@ -58,7 +59,22 @@ export function ProductDetailActions({
     : totalStock;
   const inStock = activeStock > 0;
 
-  const currentPrice = product.salePrice || product.basePrice;
+  const unitSalePrice = product.salePrice;
+  const unitBasePrice = product.basePrice;
+
+  const variantPriceNumber = selectedVariant?.price
+    ? typeof selectedVariant.price === "number"
+      ? selectedVariant.price
+      : selectedVariant.price.toNumber()
+    : null;
+
+  const activeUnitPrice = variantPriceNumber || (unitSalePrice || unitBasePrice);
+
+  // Live real-time multiplied pricing based on selected quantity
+  const totalEffectivePrice = activeUnitPrice * quantity;
+  const totalBasePrice = unitBasePrice * quantity;
+  const totalSavings = unitSalePrice ? (unitBasePrice - unitSalePrice) * quantity : 0;
+
   const isWishlisted = isInWishlist(product.id);
 
   const handleAddToCart = (redirectAfter = false) => {
@@ -69,7 +85,7 @@ export function ProductDetailActions({
       productId: product.id,
       name: selectedVariant ? `${product.name} (${selectedVariant.name})` : product.name,
       slug: product.slug,
-      price: currentPrice,
+      price: activeUnitPrice,
       originalPrice: product.salePrice ? product.basePrice : null,
       image: product.images[0]?.url || "/images/placeholder-saree.jpg",
       variantId: selectedVariantId,
@@ -89,7 +105,7 @@ export function ProductDetailActions({
       productId: product.id,
       name: product.name,
       slug: product.slug,
-      price: currentPrice,
+      price: activeUnitPrice,
       originalPrice: product.salePrice ? product.basePrice : null,
       image: product.images[0]?.url || "/images/placeholder-saree.jpg",
       fabric: product.fabric,
@@ -112,14 +128,14 @@ export function ProductDetailActions({
       }
     } else {
       await navigator.clipboard.writeText(url);
-      toast.success("Product link copied to clipboard!");
+      toast.success("Product link copied to clipboard!", { id: "product-share-copy" });
     }
   };
 
   const handleCheckPincode = (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^\d{6}$/.test(pincode.trim())) {
-      toast.error("Please enter a valid 6-digit Indian PIN code");
+      toast.error("Please enter a valid 6-digit Indian PIN code", { id: "pincode-error" });
       return;
     }
     setIsCheckingPincode(true);
@@ -131,6 +147,31 @@ export function ProductDetailActions({
 
   return (
     <div className="space-y-6">
+      {/* Real-time Dynamic Price Display */}
+      <div className="space-y-1">
+        <div className="flex flex-wrap items-baseline gap-3">
+          <span className="text-3xl md:text-4xl font-bold text-foreground tracking-tight transition-all duration-150">
+            {formatPrice(totalEffectivePrice)}
+          </span>
+          {unitSalePrice && (
+            <>
+              <span className="text-lg text-muted-foreground line-through">
+                {formatPrice(totalBasePrice)}
+              </span>
+              <span className="text-sm font-semibold text-emerald-600">
+                Save {formatPrice(totalSavings)}
+              </span>
+            </>
+          )}
+          {quantity > 1 && (
+            <span className="text-xs font-semibold text-primary bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-md">
+              {formatPrice(activeUnitPrice)} each × {quantity}
+            </span>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">Inclusive of all taxes</p>
+      </div>
+
       {/* Variants Selector */}
       {variants.length > 1 && (
         <div className="space-y-2.5">
@@ -176,12 +217,12 @@ export function ProductDetailActions({
       <div className="flex items-center justify-between gap-4 py-2 border-y border-border/50">
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-foreground">Quantity:</span>
-          <div className="flex items-center border border-border rounded-lg overflow-hidden bg-background">
+          <div className="flex items-center border border-border rounded-lg overflow-hidden bg-background shadow-xs">
             <button
               type="button"
               disabled={quantity <= 1 || !inStock}
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-9 h-9 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-30"
+              className="w-9 h-9 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed font-medium"
               aria-label="Decrease quantity"
             >
               -
@@ -193,12 +234,17 @@ export function ProductDetailActions({
               type="button"
               disabled={quantity >= activeStock || !inStock}
               onClick={() => setQuantity((q) => Math.min(activeStock, q + 1))}
-              className="w-9 h-9 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-30"
+              className="w-9 h-9 flex items-center justify-center text-foreground hover:bg-muted transition-colors disabled:opacity-30 cursor-pointer disabled:cursor-not-allowed font-medium"
               aria-label="Increase quantity"
             >
               +
             </button>
           </div>
+          {quantity > 1 && (
+            <span className="text-xs font-semibold text-primary">
+              = {formatPrice(totalEffectivePrice)}
+            </span>
+          )}
         </div>
 
         <div>
@@ -226,7 +272,11 @@ export function ProductDetailActions({
           {product.availabilityTag === "UPCOMING" ? (
             <button
               type="button"
-              onClick={() => toast.success("Notification enabled! We'll alert you when this saree launches.")}
+              onClick={() =>
+                toast.success("Notification enabled! We'll alert you when this saree launches.", {
+                  id: "upcoming-alert",
+                })
+              }
               className="flex-1 inline-flex items-center justify-center gap-2 h-12 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-xl shadow-md transition-all active:scale-[0.98]"
             >
               <span>🔔 Notify Me When Available</span>
@@ -240,7 +290,11 @@ export function ProductDetailActions({
                 className="flex-1 inline-flex items-center justify-center gap-2 h-12 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 <ShoppingCart className="h-5 w-5" />
-                {inStock ? "Add to Cart" : "Out of Stock"}
+                {inStock
+                  ? quantity > 1
+                    ? `Add to Cart (${quantity})`
+                    : "Add to Cart"
+                  : "Out of Stock"}
               </button>
 
               <button
@@ -281,7 +335,7 @@ export function ProductDetailActions({
         {/* WhatsApp Inquiry Button */}
         <a
           href={`https://wa.me/919461500924?text=${encodeURIComponent(
-            `Hello Maa Laxmi Sarees, I have an inquiry about this saree: "${product.name}" (Price: ₹${product.salePrice || product.basePrice})`
+            `Hello Maa Laxmi Sarees, I have an inquiry about this saree: "${product.name}" (Qty: ${quantity}, Total: ₹${totalEffectivePrice})`
           )}`}
           target="_blank"
           rel="noopener noreferrer"

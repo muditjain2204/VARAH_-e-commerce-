@@ -23,7 +23,7 @@ export default function WishlistPage() {
       fabric: item.fabric,
       quantity: 1,
     });
-    removeFromWishlist(item.productId);
+    removeFromWishlist(item.productId, true);
   };
 
   return (

@@ -79,9 +79,9 @@ export default function RootLayout({
           <WishlistProvider>
             <CartProvider>
               {children}
-              <Toaster position="bottom-right" richColors closeButton />
             </CartProvider>
           </WishlistProvider>
+          <Toaster position="bottom-right" richColors closeButton />
         </body>
       </html>
     </ClerkProvider>

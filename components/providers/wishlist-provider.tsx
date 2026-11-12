@@ -9,7 +9,7 @@ interface WishlistContextType {
   itemCount: number;
   isInWishlist: (productId: string) => boolean;
   toggleWishlist: (item: WishlistItemData) => void;
-  removeFromWishlist: (productId: string) => void;
+  removeFromWishlist: (productId: string, silent?: boolean) => void;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
@@ -49,32 +49,31 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   };
 
   const toggleWishlist = (item: WishlistItemData) => {
-    setItems((prev) => {
-      const exists = prev.some((i) => i.productId === item.productId);
-      if (exists) {
-        toast.info("Removed from wishlist", {
-          description: item.name,
-        });
-        return prev.filter((i) => i.productId !== item.productId);
-      } else {
-        toast.success("Saved to wishlist ❤️", {
-          description: item.name,
-        });
-        return [...prev, item];
-      }
-    });
+    const exists = items.some((i) => i.productId === item.productId);
+    if (exists) {
+      setItems((prev) => prev.filter((i) => i.productId !== item.productId));
+      toast.info("Removed from wishlist", {
+        id: `wishlist-${item.productId}`,
+        description: item.name,
+      });
+    } else {
+      setItems((prev) => [...prev, item]);
+      toast.success("Saved to wishlist ❤️", {
+        id: `wishlist-${item.productId}`,
+        description: item.name,
+      });
+    }
   };
 
-  const removeFromWishlist = (productId: string) => {
-    setItems((prev) => {
-      const itemToRemove = prev.find((i) => i.productId === productId);
-      if (itemToRemove) {
-        toast.info("Removed from wishlist", {
-          description: itemToRemove.name,
-        });
-      }
-      return prev.filter((i) => i.productId !== productId);
-    });
+  const removeFromWishlist = (productId: string, silent = false) => {
+    const itemToRemove = items.find((i) => i.productId === productId);
+    setItems((prev) => prev.filter((i) => i.productId !== productId));
+    if (itemToRemove && !silent) {
+      toast.info("Removed from wishlist", {
+        id: `wishlist-${productId}`,
+        description: itemToRemove.name,
+      });
+    }
   };
 
   return (

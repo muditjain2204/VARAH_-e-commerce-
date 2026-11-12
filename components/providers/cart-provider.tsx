@@ -118,38 +118,43 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (item: Omit<CartItemData, "quantity"> & { quantity?: number }) => {
     const qtyToAdd = item.quantity || 1;
-    setItems((prev) => {
-      const existingIndex = prev.findIndex((i) => i.id === item.id);
-      if (existingIndex > -1) {
-        const updated = [...prev];
-        const newQty = Math.min(
-          updated[existingIndex].quantity + qtyToAdd,
-          item.maxStock || MAX_CART_QUANTITY
-        );
-        updated[existingIndex] = { ...updated[existingIndex], quantity: newQty };
-        toast.success(`Updated quantity to ${newQty}`, {
+    const existing = items.find((i) => i.id === item.id);
+
+    if (existing) {
+      const newQty = Math.min(
+        existing.quantity + qtyToAdd,
+        item.maxStock || MAX_CART_QUANTITY
+      );
+      setItems((prev) =>
+        prev.map((i) => (i.id === item.id ? { ...i, quantity: newQty } : i))
+      );
+      toast.success(`Updated quantity to ${newQty}`, {
+        id: `cart-${item.id}`,
+        description: item.name,
+      });
+    } else {
+      setItems((prev) => [...prev, { ...item, quantity: qtyToAdd }]);
+      toast.success(
+        qtyToAdd > 1
+          ? `Added ${qtyToAdd} sarees to shopping bag`
+          : "Added to shopping bag",
+        {
+          id: `cart-${item.id}`,
           description: item.name,
-        });
-        return updated;
-      } else {
-        toast.success("Added to shopping bag", {
-          description: item.name,
-        });
-        return [...prev, { ...item, quantity: qtyToAdd }];
-      }
-    });
+        }
+      );
+    }
   };
 
   const removeItem = (id: string) => {
-    setItems((prev) => {
-      const itemToRemove = prev.find((i) => i.id === id);
-      if (itemToRemove) {
-        toast.info("Item removed from bag", {
-          description: itemToRemove.name,
-        });
-      }
-      return prev.filter((i) => i.id !== id);
-    });
+    const itemToRemove = items.find((i) => i.id === id);
+    setItems((prev) => prev.filter((i) => i.id !== id));
+    if (itemToRemove) {
+      toast.info("Item removed from bag", {
+        id: `cart-remove-${id}`,
+        description: itemToRemove.name,
+      });
+    }
   };
 
   const updateQuantity = (id: string, quantity: number) => {
@@ -180,15 +185,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (res.success && res.data) {
         setAppliedCoupon(res.data);
         toast.success(`Coupon ${res.data.code} applied!`, {
+          id: `coupon-${res.data.code}`,
           description: `Saved ₹${res.data.discountAmount}`,
         });
         return { success: true };
       } else {
-        toast.error(res.error || "Failed to apply coupon");
+        toast.error(res.error || "Failed to apply coupon", {
+          id: "coupon-error",
+        });
         return { success: false, error: res.error };
       }
     } catch {
-      toast.error("Error applying coupon");
+      toast.error("Error applying coupon", {
+        id: "coupon-error",
+      });
       return { success: false, error: "Network error" };
     } finally {
       setIsCouponLoading(false);
@@ -197,7 +207,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeCoupon = () => {
     setAppliedCoupon(null);
-    toast.info("Coupon removed");
+    toast.info("Coupon removed", { id: "coupon-removed" });
   };
 
   return (
