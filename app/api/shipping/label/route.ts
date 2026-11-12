@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
         <strong>RETURN IF UNDELIVERED TO:</strong><br>
         Varah Silk Store Logistics Hub<br>
         K37/42 Godowlia Chowk, Varanasi, UP - 221001<br>
-        Support: care@varah.store | +91 9876543210
+        Support: care@maalaxmi.store | +91 9461500924
       </div>
 
       <div style="font-size: 10px; color: #777; margin-top: 8px; text-align: center;">

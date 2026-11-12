@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Heart, Share2, Zap, Check, MapPin, Truck } from "lucide-react";
+import { ShoppingCart, Heart, Share2, Zap, Check, MapPin, Truck, MessageCircle } from "lucide-react";
 import { useCart } from "@/components/providers/cart-provider";
 import { useWishlist } from "@/components/providers/wishlist-provider";
 import { toast } from "sonner";
@@ -277,6 +277,19 @@ export function ProductDetailActions({
             <Share2 className="h-5 w-5" />
           </button>
         </div>
+
+        {/* WhatsApp Inquiry Button */}
+        <a
+          href={`https://wa.me/919461500924?text=${encodeURIComponent(
+            `Hello Maa Laxmi Sarees, I have an inquiry about this saree: "${product.name}" (Price: ₹${product.salePrice || product.basePrice})`
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full inline-flex items-center justify-center gap-2 h-11 border border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-semibold rounded-xl text-xs transition-all active:scale-[0.98] shadow-xs"
+        >
+          <MessageCircle className="h-4 w-4 text-emerald-600" />
+          <span>Inquire or Request Video on WhatsApp (+91 94615 00924)</span>
+        </a>
       </div>
 
       {/* PIN Code Delivery Checker */}

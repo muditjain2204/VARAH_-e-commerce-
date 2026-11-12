@@ -23,8 +23,10 @@ export function Footer() {
             </p>
             <div className="flex gap-4 pt-2">
               <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                href="https://www.instagram.com/virenderjain14?vrfl=M2p1Mjhyb3NsMW0="
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-pink-600 transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -41,8 +43,10 @@ export function Footer() {
                 </svg>
               </a>
               <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                href="https://wa.me/919461500924?text=Hello%20Maa%20Laxmi%20Sarees%2C%20I%20have%20an%20inquiry%20regarding%20your%20sarees."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-emerald-600 transition-colors"
                 aria-label="WhatsApp"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -108,11 +112,17 @@ export function Footer() {
               ))}
             </ul>
             <div className="mt-6 space-y-2">
+              <a
+                href="https://wa.me/919461500924?text=Hello%20Maa%20Laxmi%20Sarees%2C%20I%20have%20an%20inquiry."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-emerald-600 transition-colors flex items-center gap-1.5"
+              >
+                <span>💬 WhatsApp & Call:</span>
+                <span className="font-semibold text-foreground">+91 94615 00924</span>
+              </a>
               <p className="text-xs text-muted-foreground">
-                📞 +91 98765 43210
-              </p>
-              <p className="text-xs text-muted-foreground">
-                ✉️ support@varah.store
+                ✉️ support@maalaxmi.store
               </p>
             </div>
           </div>

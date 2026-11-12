@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { Navbar, Footer } from "@/components/layout";
+import { Navbar, Footer, WhatsAppButton } from "@/components/layout";
 import { AdminPreviewBar } from "@/components/admin/admin-preview-bar";
 
 export default async function StoreLayout({
@@ -16,6 +16,7 @@ export default async function StoreLayout({
       <Navbar />
       <main className="flex-1">{children}</main>
       <Footer />
+      <WhatsAppButton />
     </div>
   );
 }

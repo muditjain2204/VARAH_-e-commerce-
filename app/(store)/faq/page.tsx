@@ -73,7 +73,7 @@ const FAQ_DATA: FAQCategory[] = [
       {
         question: "Can I change my delivery address after placing an order?",
         answer:
-          "If your order has not been dispatched yet, contact us immediately via WhatsApp (+91 98765 43210) or email support@maalaxmi.store, and our team will update your shipping destination.",
+          "If your order has not been dispatched yet, contact us immediately via WhatsApp (+91 94615 00924) or email support@maalaxmi.store, and our team will update your shipping destination.",
       },
     ],
   },
@@ -89,7 +89,7 @@ const FAQ_DATA: FAQCategory[] = [
       {
         question: "How do I initiate a return or exchange?",
         answer:
-          "Simply email us at support@maalaxmi.store or WhatsApp us at +91 98765 43210 with your Order Number and photos of the saree. We will verify and arrange a doorstep reverse pickup for you.",
+          "Simply email us at support@maalaxmi.store or WhatsApp us at +91 94615 00924 with your Order Number and photos of the saree. We will verify and arrange a doorstep reverse pickup for you.",
       },
       {
         question: "How long does it take to receive my refund?",

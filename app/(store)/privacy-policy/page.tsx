@@ -162,7 +162,7 @@ export default function PrivacyPolicyPage() {
               <p><strong>Company:</strong> MAA LAXMI Sarees & Handlooms</p>
               <p><strong>Address:</strong> Radha Krishna Textile Market, Ring Road, Surat, Gujarat — 395002, India</p>
               <p><strong>Email:</strong> privacy@maalaxmi.store / support@maalaxmi.store</p>
-              <p><strong>Phone:</strong> +91 98765 43210</p>
+              <p><strong>Phone / WhatsApp:</strong> +91 94615 00924</p>
             </div>
           </div>
         </div>

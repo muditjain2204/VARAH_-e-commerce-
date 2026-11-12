@@ -135,7 +135,7 @@ export default function ShippingPolicyPage() {
               <span>Inspection Upon Delivery</span>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              If the outer courier parcel appears noticeably damaged, torn, or tampered with at the time of delivery, please <strong>refuse to accept the package</strong> and take a clear photograph. Notify our support desk immediately at <a href="mailto:support@maalaxmi.store" className="text-primary underline">support@maalaxmi.store</a> or call <span className="font-semibold">+91 98765 43210</span> with your Order Number so we can dispatch a replacement promptly.
+              If the outer courier parcel appears noticeably damaged, torn, or tampered with at the time of delivery, please <strong>refuse to accept the package</strong> and take a clear photograph. Notify our support desk immediately at <a href="mailto:support@maalaxmi.store" className="text-primary underline">support@maalaxmi.store</a> or call/WhatsApp <span className="font-semibold">+91 94615 00924</span> with your Order Number so we can dispatch a replacement promptly.
             </p>
           </div>
 

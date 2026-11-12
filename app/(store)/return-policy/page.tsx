@@ -86,7 +86,7 @@ export default function ReturnPolicyPage() {
               <li>
                 <strong>Submit Request:</strong> Email us at{" "}
                 <a href="mailto:support@maalaxmi.store" className="text-primary underline font-medium">support@maalaxmi.store</a>{" "}
-                or message our WhatsApp care desk at <strong>+91 98765 43210</strong> with your <strong>Order Number (e.g. VRH-XXXXXXXX-XXXX)</strong>, product photos, and reason for return.
+                or message our WhatsApp care desk at <strong>+91 94615 00924</strong> with your <strong>Order Number (e.g. VRH-XXXXXXXX-XXXX)</strong>, product photos, and reason for return.
               </li>
               <li>
                 <strong>Pickup Scheduling:</strong> Once verified (typically within 24 hours), our courier partner will arrange a doorstep reverse pickup from your original delivery address.
