@@ -132,12 +132,12 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-3 py-2 text-sm font-medium text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors"
+                className="px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -151,7 +151,7 @@ export function Navbar() {
                   setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
                   setIsPriceDropdownOpen(false);
                 }}
-                className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                   isCategoriesDropdownOpen
                     ? "bg-accent text-foreground"
                     : "text-foreground/70 hover:text-foreground hover:bg-accent"
@@ -159,7 +159,7 @@ export function Navbar() {
               >
                 <span>Categories</span>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                  className={`h-3.5 w-3.5 transition-transform duration-200 flex-shrink-0 ${
                     isCategoriesDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -214,16 +214,16 @@ export function Navbar() {
                   setIsPriceDropdownOpen(!isPriceDropdownOpen);
                   setIsCategoriesDropdownOpen(false);
                 }}
-                className={`flex items-center gap-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                   isPriceDropdownOpen
                     ? "bg-accent text-foreground"
                     : "text-foreground/70 hover:text-foreground hover:bg-accent"
                 }`}
               >
-                <IndianRupee className="h-3.5 w-3.5" />
+                <IndianRupee className="h-3.5 w-3.5 flex-shrink-0" />
                 <span>Price Range</span>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                  className={`h-3.5 w-3.5 transition-transform duration-200 flex-shrink-0 ${
                     isPriceDropdownOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -309,7 +309,7 @@ export function Navbar() {
             </div>
           </nav>
 
-          {/* Right side: Search, Wishlist, Cart, Auth */}
+          {/* Right side: Search, Wishlist, Cart, Profile (Clean 4-Icon Group Matching Brand Design) */}
           <div className="flex items-center gap-1">
             {/* Search */}
             <button
@@ -348,44 +348,28 @@ export function Navbar() {
               )}
             </Link>
 
-            {/* Profile Viewer */}
-            <Link
-              href="/account/profile"
-              className="p-2 text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors"
-              title="My Profile"
-              aria-label="Profile Viewer"
-            >
-              <User className="h-5 w-5" />
-            </Link>
-
-            {/* Auth */}
+            {/* Account / Profile Icon */}
             <Show when="signed-out">
-              <div className="hidden sm:flex items-center gap-1.5 ml-1">
-                <SignInButton mode="modal">
-                  <button className="px-3 py-1.5 text-xs font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-lg transition-colors">
-                    Sign In
-                  </button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <button className="px-3.5 py-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors shadow-xs">
-                    Sign Up
-                  </button>
-                </SignUpButton>
-              </div>
-              <SignUpButton mode="modal">
-                <button className="sm:hidden px-2.5 py-1 text-[11px] font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors shadow-xs">
-                  Sign Up
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="p-2 text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors"
+                  title="Sign In / Account"
+                  aria-label="Account"
+                >
+                  <User className="h-5 w-5" />
                 </button>
-              </SignUpButton>
+              </SignInButton>
             </Show>
             <Show when="signed-in">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "h-8 w-8",
-                  },
-                }}
-              />
+              <Link
+                href="/account/profile"
+                className="p-2 text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors"
+                title="My Profile"
+                aria-label="Profile Viewer"
+              >
+                <User className="h-5 w-5" />
+              </Link>
             </Show>
           </div>
         </div>
