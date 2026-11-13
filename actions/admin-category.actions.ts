@@ -146,13 +146,34 @@ export async function createCategoryAction(
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
+  let finalImageUrl = input.image;
+  if (finalImageUrl && finalImageUrl.startsWith("data:image/") && process.env.CLOUDINARY_API_KEY) {
+    try {
+      const { v2: cloudinary } = await import("cloudinary");
+      cloudinary.config({
+        cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        secure: true,
+      });
+      const uploadRes = await cloudinary.uploader.upload(finalImageUrl, {
+        folder: "maalaxmi_categories",
+      });
+      if (uploadRes?.secure_url) {
+        finalImageUrl = uploadRes.secure_url;
+      }
+    } catch (uploadErr) {
+      console.warn("Cloudinary upload fallback in createCategoryAction:", uploadErr);
+    }
+  }
+
   try {
     const category = await prisma.category.create({
       data: {
         name: input.name.trim(),
         slug: `${slug}-${Date.now().toString().slice(-3)}`,
         description: input.description?.trim(),
-        image: input.image,
+        image: finalImageUrl,
         sortOrder: input.sortOrder ?? 0,
         isActive: input.isActive ?? true,
       },
@@ -185,7 +206,7 @@ export async function createCategoryAction(
         name: input.name,
         slug,
         description: input.description,
-        image: input.image,
+        image: finalImageUrl,
         sortOrder: input.sortOrder ?? 0,
         isActive: input.isActive ?? true,
         productCount: 0,
@@ -201,7 +222,28 @@ export async function createCategoryAction(
 export async function updateCategoryAction(
   id: string,
   input: UpdateCategoryInput
-): Promise<ActionResponse<boolean>> {
+): Promise<ActionResponse<{ image?: string | null }>> {
+  let finalImageUrl = input.image;
+  if (finalImageUrl && finalImageUrl.startsWith("data:image/") && process.env.CLOUDINARY_API_KEY) {
+    try {
+      const { v2: cloudinary } = await import("cloudinary");
+      cloudinary.config({
+        cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+        secure: true,
+      });
+      const uploadRes = await cloudinary.uploader.upload(finalImageUrl, {
+        folder: "maalaxmi_categories",
+      });
+      if (uploadRes?.secure_url) {
+        finalImageUrl = uploadRes.secure_url;
+      }
+    } catch (uploadErr) {
+      console.warn("Cloudinary upload fallback in updateCategoryAction:", uploadErr);
+    }
+  }
+
   try {
     await prisma.category.update({
       where: { id },
@@ -209,7 +251,7 @@ export async function updateCategoryAction(
         ...(input.name && { name: input.name.trim() }),
         ...(input.slug && { slug: input.slug.trim() }),
         ...(input.description !== undefined && { description: input.description }),
-        ...(input.image !== undefined && { image: input.image }),
+        ...(finalImageUrl !== undefined && { image: finalImageUrl }),
         ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
         ...(input.isActive !== undefined && { isActive: input.isActive }),
       },
@@ -218,10 +260,10 @@ export async function updateCategoryAction(
     revalidatePath("/admin/categories");
     revalidatePath("/categories");
     revalidatePath("/products");
-    return { success: true, data: true };
+    return { success: true, data: { image: finalImageUrl } };
   } catch (error) {
     console.warn("Database fallback in updateCategoryAction:", error);
-    return { success: true, data: true };
+    return { success: true, data: { image: finalImageUrl } };
   }
 }
 

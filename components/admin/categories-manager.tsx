@@ -15,6 +15,8 @@ import {
   Sparkles,
   AlertCircle,
   Eye,
+  UploadCloud,
+  ImageIcon,
 } from "lucide-react";
 import {
   AdminCategoryItem,
@@ -84,6 +86,61 @@ export function CategoriesManager({ initialCategories }: CategoriesManagerProps)
       (c.description && c.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  const handleImageUpload = (file: File | undefined, mode: "add" | "edit") => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file (PNG, JPG, WebP)");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image file must be smaller than 10MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement("img");
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 900;
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.85);
+
+        if (mode === "add") {
+          setNewCat((prev) => ({ ...prev, image: compressedDataUrl }));
+          toast.success("Image selected and optimized!");
+        } else if (editingCategory) {
+          setEditingCategory((prev) =>
+            prev ? { ...prev, image: compressedDataUrl } : null
+          );
+          toast.success("Image selected and optimized!");
+        }
+      };
+      img.src = String(e.target?.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCat.name.trim()) {
@@ -132,8 +189,11 @@ export function CategoriesManager({ initialCategories }: CategoriesManagerProps)
       });
 
       if (res.success) {
+        const finalImage =
+          res.data?.image !== undefined ? res.data.image : editingCategory.image;
+        const updatedCat = { ...editingCategory, image: finalImage };
         setCategories((prev) =>
-          prev.map((c) => (c.id === editingCategory.id ? editingCategory : c))
+          prev.map((c) => (c.id === editingCategory.id ? updatedCat : c))
         );
         toast.success(`Category "${editingCategory.name}" updated!`);
         setEditingCategory(null);
@@ -422,17 +482,80 @@ export function CategoriesManager({ initialCategories }: CategoriesManagerProps)
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-foreground">
-                  Image URL
+              <div className="space-y-3">
+                <label className="text-xs font-semibold text-foreground block">
+                  Category Banner Image
                 </label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
-                  value={newCat.image || ""}
-                  onChange={(e) => setNewCat({ ...newCat, image: e.target.value })}
-                  className="w-full mt-1 px-3 py-2 text-xs rounded-xl border border-border bg-background font-mono"
-                />
+
+                {/* Local browse / upload */}
+                <div className="space-y-2">
+                  <label className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-border bg-muted/30 hover:border-primary hover:bg-primary/5 cursor-pointer transition-all">
+                    <UploadCloud className="h-6 w-6 text-primary" />
+                    <div className="text-center">
+                      <span className="text-xs font-semibold text-foreground">
+                        Browse & Upload from Local Device
+                      </span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        PNG, JPG, WebP (auto-optimized for fast loading)
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="sr-only"
+                      onChange={(e) => {
+                        handleImageUpload(e.target.files?.[0], "add");
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+
+                  {/* Preview if present */}
+                  {newCat.image && (
+                    <div className="relative flex items-center gap-3 p-2.5 rounded-xl border border-border bg-card">
+                      <div className="relative h-16 w-20 rounded-lg overflow-hidden border border-border bg-muted shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={newCat.image}
+                          alt="Category preview"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-foreground truncate">
+                          Image selected
+                        </p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {newCat.image.startsWith("data:")
+                            ? "Local file (ready to save)"
+                            : newCat.image}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setNewCat({ ...newCat, image: "" })}
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        title="Remove image"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Direct URL input option */}
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground block mb-1">
+                    Or enter / paste external Image URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/..."
+                    value={newCat.image || ""}
+                    onChange={(e) => setNewCat({ ...newCat, image: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-mono focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-between pt-2">
@@ -539,21 +662,90 @@ export function CategoriesManager({ initialCategories }: CategoriesManagerProps)
                 />
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-foreground">
-                  Image URL
+              <div className="space-y-3">
+                <label className="text-xs font-semibold text-foreground block">
+                  Category Banner Image
                 </label>
-                <input
-                  type="url"
-                  value={editingCategory.image || ""}
-                  onChange={(e) =>
-                    setEditingCategory({
-                      ...editingCategory,
-                      image: e.target.value,
-                    })
-                  }
-                  className="w-full mt-1 px-3 py-2 text-xs rounded-xl border border-border bg-background font-mono"
-                />
+
+                {/* Local browse / upload */}
+                <div className="space-y-2">
+                  <label className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-border bg-muted/30 hover:border-primary hover:bg-primary/5 cursor-pointer transition-all">
+                    <UploadCloud className="h-6 w-6 text-primary" />
+                    <div className="text-center">
+                      <span className="text-xs font-semibold text-foreground">
+                        Browse & Upload from Local Device
+                      </span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        PNG, JPG, WebP (auto-optimized for fast loading)
+                      </p>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="sr-only"
+                      onChange={(e) => {
+                        handleImageUpload(e.target.files?.[0], "edit");
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+
+                  {/* Preview if present */}
+                  {editingCategory.image && (
+                    <div className="relative flex items-center gap-3 p-2.5 rounded-xl border border-border bg-card">
+                      <div className="relative h-16 w-20 rounded-lg overflow-hidden border border-border bg-muted shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={editingCategory.image}
+                          alt="Category preview"
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium text-foreground truncate">
+                          Current image
+                        </p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {editingCategory.image.startsWith("data:")
+                            ? "Local file (ready to save)"
+                            : editingCategory.image}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingCategory({
+                            ...editingCategory,
+                            image: "",
+                          })
+                        }
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        title="Remove image"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Direct URL input option */}
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground block mb-1">
+                    Or enter / paste external Image URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/..."
+                    value={editingCategory.image || ""}
+                    onChange={(e) =>
+                      setEditingCategory({
+                        ...editingCategory,
+                        image: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-mono focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-between pt-2">
