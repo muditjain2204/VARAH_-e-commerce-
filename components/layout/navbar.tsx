@@ -108,8 +108,8 @@ export function Navbar() {
         <span className="font-bold">MAA LAXMI</span>
       </div>
 
-      <nav className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between gap-4">
+      <nav className="w-full max-w-[1680px] mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="flex h-16 items-center justify-between gap-2 lg:gap-3 xl:gap-4">
           {/* Mobile menu toggle */}
           <button
             className="lg:hidden p-2 -ml-2 text-foreground/70 hover:text-foreground transition-colors"
@@ -126,18 +126,18 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex-shrink-0 font-playfair text-2xl font-bold tracking-tight text-foreground hover:text-primary transition-colors flex items-center gap-1.5"
+            className="flex-shrink-0 font-playfair text-xl sm:text-2xl font-bold tracking-tight text-foreground hover:text-primary transition-colors flex items-center gap-1.5 mr-1"
           >
             <span>MAA LAXMI</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5 flex-shrink-0">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors whitespace-nowrap"
+                className="px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors whitespace-nowrap"
               >
                 {link.label}
               </Link>
@@ -151,7 +151,7 @@ export function Navbar() {
                   setIsCategoriesDropdownOpen(!isCategoriesDropdownOpen);
                   setIsPriceDropdownOpen(false);
                 }}
-                className={`flex items-center gap-1 px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-1 px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                   isCategoriesDropdownOpen
                     ? "bg-accent text-foreground"
                     : "text-foreground/70 hover:text-foreground hover:bg-accent"
@@ -214,7 +214,7 @@ export function Navbar() {
                   setIsPriceDropdownOpen(!isPriceDropdownOpen);
                   setIsCategoriesDropdownOpen(false);
                 }}
-                className={`flex items-center gap-1 px-2.5 xl:px-3 py-2 text-xs xl:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
+                className={`flex items-center gap-1 px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                   isPriceDropdownOpen
                     ? "bg-accent text-foreground"
                     : "text-foreground/70 hover:text-foreground hover:bg-accent"
@@ -309,8 +309,8 @@ export function Navbar() {
             </div>
           </nav>
 
-          {/* Right side: Search, Wishlist, Cart, Profile (Clean 4-Icon Group Matching Brand Design) */}
-          <div className="flex items-center gap-1">
+          {/* Right side: Search, Wishlist, Cart, Profile & Brown Auth Buttons */}
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
             {/* Search */}
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -348,7 +348,7 @@ export function Navbar() {
               )}
             </Link>
 
-            {/* Account / Profile Icon */}
+            {/* Profile / Account Icon */}
             <Show when="signed-out">
               <SignInButton mode="modal">
                 <button
@@ -360,7 +360,28 @@ export function Navbar() {
                   <User className="h-5 w-5" />
                 </button>
               </SignInButton>
+
+              {/* Signature Brand Brown / Maroon Auth Action Buttons */}
+              <div className="hidden sm:flex items-center gap-1.5 ml-0.5">
+                <SignInButton mode="modal">
+                  <button
+                    type="button"
+                    className="px-2.5 xl:px-3 py-1.5 text-xs font-semibold text-primary hover:text-primary-foreground hover:bg-primary border border-primary/50 hover:border-primary rounded-lg transition-all whitespace-nowrap"
+                  >
+                    Sign In
+                  </button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <button
+                    type="button"
+                    className="px-3 xl:px-3.5 py-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg shadow-xs transition-all whitespace-nowrap active:scale-95"
+                  >
+                    Sign Up
+                  </button>
+                </SignUpButton>
+              </div>
             </Show>
+
             <Show when="signed-in">
               <Link
                 href="/account/profile"
@@ -370,6 +391,13 @@ export function Navbar() {
               >
                 <User className="h-5 w-5" />
               </Link>
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "h-8 w-8",
+                  },
+                }}
+              />
             </Show>
           </div>
         </div>
