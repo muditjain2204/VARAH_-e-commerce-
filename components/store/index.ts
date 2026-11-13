@@ -7,3 +7,5 @@ export { ProductDetailActions } from "./product-detail-actions";
 export { ProductGallery } from "./product-gallery";
 export { SareeCarousel3D } from "./saree-carousel-3d";
 export { TopBarPriceFilter } from "./top-bar-price-filter";
+export { RealtimeTracking } from "./realtime-tracking";
+export { PublicTracker } from "./public-tracker";

@@ -193,6 +193,7 @@ export const NAV_LINKS = [
   { label: "New Arrivals", href: "/products?filter=new" },
   { label: "Best Sellers", href: "/products?filter=bestseller" },
   { label: "Wedding", href: "/products?occasion=Wedding" },
+  { label: "Track Delivery", href: "/track" },
 ] as const;
 
 export const FOOTER_LINKS = {
@@ -209,11 +210,11 @@ export const FOOTER_LINKS = {
     { label: "Half Sarees", href: "/categories/half-sarees" },
   ],
   help: [
+    { label: "Track Your Saree", href: "/track" },
     { label: "Contact Us", href: "/contact" },
     { label: "FAQs", href: "/faq" },
     { label: "Shipping Policy", href: "/shipping-policy" },
     { label: "Return Policy", href: "/return-policy" },
-    { label: "Track Order", href: "/account/orders" },
   ],
   company: [
     { label: "About Us", href: "/about" },

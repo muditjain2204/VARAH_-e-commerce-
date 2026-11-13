@@ -314,50 +314,105 @@ export async function trackShipmentByAwb(
     }
   }
 
-  // High-fidelity simulation tracking timeline
+  return generateDynamicTimeline("IN_TRANSIT", awbCode);
+}
+
+/**
+ * Generate a realistic, milestone-matched tracking timeline based on current status
+ */
+export function generateDynamicTimeline(
+  status: string,
+  awbCode: string,
+  originCity = "Varanasi Hub, UP",
+  destCity = "Destination Delivery Hub",
+  courierName = "Delhivery Surface"
+): ShiprocketTrackingResult {
   const now = new Date();
-  const d1 = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-  const d2 = new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString();
-  const d3 = new Date().toISOString();
+  const t0 = new Date(now.getTime() - 40 * 60 * 60 * 1000).toISOString();
+  const t1 = new Date(now.getTime() - 26 * 60 * 60 * 1000).toISOString();
+  const t2 = new Date(now.getTime() - 14 * 60 * 60 * 1000).toISOString();
+  const t3 = new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString();
+  const t4 = now.toISOString();
+
+  const norm = (status || "IN_TRANSIT").toUpperCase();
+  const activities: TrackingActivity[] = [
+    {
+      date: t0,
+      status: "PICKUP_SCHEDULED",
+      activity: "Manifest created & pickup scheduled at Maa Laxmi Varanasi workshop",
+      location: "Varanasi Godowlia Hub, UP",
+      sr_status_label: "Pickup Scheduled",
+    },
+  ];
+
+  if (
+    norm.includes("PICKED") ||
+    norm.includes("TRANSIT") ||
+    norm.includes("OUT") ||
+    norm.includes("DELIVERED")
+  ) {
+    activities.unshift({
+      date: t1,
+      status: "PICKED_UP",
+      activity: `Consignment picked up and scanned by ${courierName}`,
+      location: "Varanasi Logistics Center, UP",
+      sr_status_label: "Picked Up",
+    });
+  }
+
+  if (norm.includes("TRANSIT") || norm.includes("OUT") || norm.includes("DELIVERED")) {
+    activities.unshift({
+      date: t2,
+      status: "IN_TRANSIT",
+      activity: "Dispatched from primary sorting facility towards destination city",
+      location: "Lucknow Central Logistics Hub",
+      sr_status_label: "In Transit",
+    });
+    activities.unshift({
+      date: t3,
+      status: "IN_TRANSIT",
+      activity: `Arrived at regional delivery hub: ${destCity}`,
+      location: destCity,
+      sr_status_label: "Arrived at Destination Hub",
+    });
+  }
+
+  if (norm.includes("OUT") || norm.includes("DELIVERED")) {
+    activities.unshift({
+      date: t3,
+      status: "OUT_FOR_DELIVERY",
+      activity: "Package is out for delivery with local delivery executive",
+      location: destCity,
+      sr_status_label: "Out for Delivery",
+    });
+  }
+
+  if (norm.includes("DELIVERED")) {
+    activities.unshift({
+      date: t4,
+      status: "DELIVERED",
+      activity: "Package safely delivered to consignee",
+      location: destCity,
+      sr_status_label: "Delivered",
+    });
+  }
 
   return {
     tracking_data: {
-      track_status: 1,
-      shipment_status: 6, // In Transit
+      track_status: norm.includes("DELIVERED") ? 7 : norm.includes("OUT") ? 5 : 6,
+      shipment_status: norm.includes("DELIVERED") ? 7 : 6,
       shipment_track: [
         {
-          id: 12345,
+          id: 990142,
           awb_code: awbCode,
-          courier_name: "Delhivery Surface",
-          current_status: "In Transit",
-          origin: "Varanasi Hub, UP",
-          destination: "Customer Destination",
+          courier_name: courierName,
+          current_status: norm.replace(/_/g, " "),
+          origin: originCity,
+          destination: destCity,
           etd: new Date(now.getTime() + 48 * 60 * 60 * 1000).toISOString(),
         },
       ],
-      shipment_track_activities: [
-        {
-          date: d1,
-          status: "PICKED_UP",
-          activity: "Package picked up from Varanasi Workshop",
-          location: "Varanasi Central Hub",
-          sr_status_label: "Picked Up",
-        },
-        {
-          date: d2,
-          status: "IN_TRANSIT",
-          activity: "Departed from Sorting Facility",
-          location: "Lucknow Logistics Hub",
-          sr_status_label: "In Transit",
-        },
-        {
-          date: d3,
-          status: "IN_TRANSIT",
-          activity: "Arrived at Regional Distribution Center",
-          location: "Destination Hub",
-          sr_status_label: "In Transit",
-        },
-      ],
+      shipment_track_activities: activities,
       track_url: `https://shiprocket.co/tracking/${awbCode}`,
     },
   };

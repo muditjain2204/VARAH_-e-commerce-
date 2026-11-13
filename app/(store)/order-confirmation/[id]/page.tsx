@@ -142,8 +142,28 @@ export default async function OrderConfirmationPage({ params }: OrderConfirmatio
           </div>
         )}
 
+        {/* Live Delivery Tracking Box */}
+        <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-left">
+            <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0">
+              <Truck className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm text-foreground">Want to track your package?</h3>
+              <p className="text-xs text-muted-foreground">Monitor real-time pickup, transit, and delivery status anytime.</p>
+            </div>
+          </div>
+          <Link
+            href={`/track?order=${displayOrderNumber}`}
+            className="w-full sm:w-auto px-5 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-xl shadow-xs transition-all active:scale-95 flex items-center justify-center gap-2"
+          >
+            <span>Track Live Delivery</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
         {/* Next Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Link
             href="/account/orders"
             className="flex-1 h-12 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-colors shadow-sm"
