@@ -363,105 +363,11 @@ export async function getProductByIdAction(
         },
       };
     }
+
+    return { success: false, error: `No saree found matching "${cleanId}"` };
   } catch (e) {
-    console.warn("Database lookup fallback:", e);
+    console.warn("Database lookup error:", e);
+    return { success: false, error: "Failed to look up saree" };
   }
-
-  // Fallback demo samples
-  const samples = [
-    {
-      id: "saree_1",
-      name: "Royal Crimson Kanjivaram Pure Silk Saree",
-      slug: "royal-crimson-kanjivaram-pure-silk-saree",
-      sku: "KANJ-CRM-001",
-      description: "Handwoven crimson red Kanjivaram silk saree with authentic 24k gold zari pallu.",
-      fabric: "Kanjivaram Silk",
-      occasion: "Bridal",
-      color: "Crimson Red",
-      basePrice: 18999,
-      salePrice: 16499,
-      availabilityTag: "IN_STOCK",
-      isTrending: true,
-      isFeatured: true,
-      isNewArrival: false,
-      isBestSeller: true,
-      category: { id: "cat_silk", name: "Silk", slug: "silk" },
-      images: [{ url: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80", isPrimary: true }],
-      totalStock: 12,
-    },
-    {
-      id: "saree_2",
-      name: "Varanasi Antique Gold Banarasi Brocade Saree",
-      slug: "varanasi-antique-gold-banarasi-brocade-saree",
-      sku: "BAN-GLD-002",
-      description: "Traditional Banarasi brocade masterpiece with floral jaal motifs.",
-      fabric: "Banarasi Silk",
-      occasion: "Wedding",
-      color: "Gold",
-      basePrice: 14500,
-      salePrice: 12999,
-      availabilityTag: "IN_STOCK",
-      isTrending: true,
-      isFeatured: false,
-      isNewArrival: true,
-      isBestSeller: true,
-      category: { id: "cat_banarasi", name: "Banarasi", slug: "banarasi" },
-      images: [{ url: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80", isPrimary: true }],
-      totalStock: 8,
-    },
-    {
-      id: "saree_3",
-      name: "Midnight Indigo Chanderi Cotton Saree",
-      slug: "midnight-indigo-chanderi-cotton-saree",
-      sku: "CHAN-IND-003",
-      description: "Lightweight and airy Chanderi cotton drape with silver bootis.",
-      fabric: "Chanderi",
-      occasion: "Festive",
-      color: "Indigo Blue",
-      basePrice: 4200,
-      salePrice: 3500,
-      availabilityTag: "OUT_OF_STOCK",
-      isTrending: false,
-      isFeatured: false,
-      isNewArrival: false,
-      isBestSeller: false,
-      category: { id: "cat_cotton", name: "Cotton", slug: "cotton" },
-      images: [{ url: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=800&auto=format&fit=crop&q=80", isPrimary: true }],
-      totalStock: 0,
-    },
-    {
-      id: "saree_4",
-      name: "Heritage Emerald Organza Saree with Zari Border",
-      slug: "heritage-emerald-organza-saree",
-      sku: "ORG-EMR-004",
-      description: "Sheer, crisp organza saree with delicate floral embroidery for festive evenings.",
-      fabric: "Organza",
-      occasion: "Party Wear",
-      color: "Emerald Green",
-      basePrice: 8900,
-      salePrice: null,
-      availabilityTag: "UPCOMING",
-      isTrending: false,
-      isFeatured: true,
-      isNewArrival: true,
-      isBestSeller: false,
-      category: { id: "cat_silk", name: "Silk", slug: "silk" },
-      images: [{ url: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80", isPrimary: true }],
-      totalStock: 25,
-    },
-  ];
-
-  const matched = samples.find(
-    (s) =>
-      s.id.toLowerCase() === cleanId.toLowerCase() ||
-      s.sku.toLowerCase() === cleanId.toLowerCase() ||
-      s.name.toLowerCase().includes(cleanId.toLowerCase())
-  );
-
-  if (matched) {
-    return { success: true, data: matched };
-  }
-
-  return { success: false, error: `No saree found matching "${cleanId}". Try "saree_1" or "KANJ-CRM-001"` };
 }
 

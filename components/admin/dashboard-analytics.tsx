@@ -31,8 +31,10 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
   const [isCurateModalOpen, setIsCurateModalOpen] = useState(false);
 
   // Find maximum revenue for monthly bar chart normalization
-  const maxRevenue = Math.max(...analytics.monthlyRevenue.map((m) => m.revenue), 1);
-  const totalStatusCount = analytics.ordersByStatus.reduce((sum, s) => sum + s.count, 0) || 1;
+  const maxRevenue = Math.max(...(analytics.monthlyRevenue || []).map((m) => m.revenue), 0);
+  const hasRevenue = maxRevenue > 0;
+  const totalStatusCount = (analytics.ordersByStatus || []).reduce((sum, s) => sum + s.count, 0);
+  const hasOrders = totalStatusCount > 0;
 
   return (
     <div className="space-y-8">
@@ -91,8 +93,14 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
           <p className="text-2xl sm:text-3xl font-bold text-foreground">
             {formatPrice(analytics.totalRevenue)}
           </p>
-          <p className="text-xs text-emerald-600 font-medium flex items-center gap-1">
-            <TrendingUp className="h-3.5 w-3.5" /> +24% from last month
+          <p className="text-xs font-medium flex items-center gap-1">
+            {analytics.totalRevenue > 0 ? (
+              <span className="text-emerald-600 flex items-center gap-1">
+                <TrendingUp className="h-3.5 w-3.5" /> Real-time Store Revenue
+              </span>
+            ) : (
+              <span className="text-muted-foreground">₹0 total revenue (Store ready)</span>
+            )}
           </p>
         </div>
 
@@ -110,7 +118,13 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
             {analytics.totalOrders}
           </p>
           <p className="text-xs text-muted-foreground">
-            Avg. Order Value: <strong>{formatPrice(analytics.averageOrderValue)}</strong>
+            {analytics.totalOrders > 0 ? (
+              <>
+                Avg. Order Value: <strong>{formatPrice(analytics.averageOrderValue)}</strong>
+              </>
+            ) : (
+              <span>Awaiting customer orders</span>
+            )}
           </p>
         </div>
 
@@ -128,7 +142,9 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
             {analytics.totalProducts} Designs
           </p>
           <p className="text-xs text-muted-foreground">
-            Active handcrafted weaves
+            {analytics.totalProducts > 0
+              ? "Active handcrafted weaves"
+              : "0 Sarees listed (Ready for today's listing)"}
           </p>
         </div>
 
@@ -146,7 +162,9 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
             {analytics.totalCustomers}
           </p>
           <p className="text-xs text-muted-foreground">
-            Across 28 Indian States & UTs
+            {analytics.totalCustomers === 1
+              ? "1 Registered customer account"
+              : `${analytics.totalCustomers} Registered customer accounts`}
           </p>
         </div>
       </div>
@@ -159,14 +177,22 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
             <div>
               <h2 className="font-semibold text-sm text-foreground flex items-center gap-2">
                 <BarChart3 className="h-4 w-4 text-primary" />
-                <span>Monthly Revenue Trends (FY 2026)</span>
+                <span>Monthly Revenue Trends</span>
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Consistent month-over-month growth powered by festive & wedding collections
+                {hasRevenue
+                  ? "Consistent real-time revenue tracking across recent months"
+                  : "Monthly sales graph will populate automatically as customer orders are placed"}
               </p>
             </div>
-            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded-md">
-              High Growth
+            <span
+              className={`text-xs font-semibold px-2 py-1 rounded-md ${
+                hasRevenue
+                  ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40"
+                  : "text-muted-foreground bg-muted"
+              }`}
+            >
+              {hasRevenue ? "Active Orders" : "Live Store Ready"}
             </span>
           </div>
 
@@ -174,7 +200,9 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
           <div className="pt-4 space-y-2">
             <div className="h-48 flex items-end gap-3 sm:gap-6 pt-4 border-b border-border">
               {analytics.monthlyRevenue.map((item) => {
-                const heightPercent = Math.max(12, Math.round((item.revenue / maxRevenue) * 100));
+                const heightPercent = hasRevenue
+                  ? Math.max(item.revenue > 0 ? 8 : 2, Math.round((item.revenue / maxRevenue) * 100))
+                  : 2;
                 return (
                   <div key={item.month} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
                     {/* Tooltip / Value on hover */}
@@ -184,7 +212,11 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
                     {/* Bar */}
                     <div
                       style={{ height: `${heightPercent}%` }}
-                      className="w-full max-w-[38px] rounded-t-lg bg-primary hover:bg-primary/80 transition-all shadow-sm"
+                      className={`w-full max-w-[38px] rounded-t-lg transition-all shadow-sm ${
+                        item.revenue > 0
+                          ? "bg-primary hover:bg-primary/80"
+                          : "bg-muted hover:bg-muted-foreground/20"
+                      }`}
                     />
                     <span className="text-xs font-semibold text-muted-foreground">
                       {item.month}
@@ -195,8 +227,8 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
             </div>
             <div className="flex justify-between text-[11px] text-muted-foreground pt-1">
               <span>₹0</span>
-              <span>₹2.5L</span>
-              <span>₹5.0L+</span>
+              <span>{hasRevenue ? formatPrice(Math.round(maxRevenue / 2)) : "₹25,000"}</span>
+              <span>{hasRevenue ? formatPrice(maxRevenue) : "₹50,000+"}</span>
             </div>
           </div>
         </div>
@@ -209,19 +241,21 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
               <span>Fulfillment Breakdown</span>
             </h2>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Live status distribution of active orders
+              {hasOrders
+                ? "Live status distribution of active orders"
+                : "Live status distribution of customer orders"}
             </p>
           </div>
 
           <div className="space-y-3 pt-2">
             {analytics.ordersByStatus.map((item) => {
-              const percentage = Math.round((item.count / totalStatusCount) * 100);
+              const percentage = hasOrders ? Math.round((item.count / totalStatusCount) * 100) : 0;
               return (
                 <div key={item.status} className="space-y-1">
                   <div className="flex justify-between text-xs font-semibold">
                     <span className="text-foreground">{item.status}</span>
                     <span className="text-muted-foreground">
-                      {item.count} orders ({percentage}%)
+                      {item.count} orders {hasOrders ? `(${percentage}%)` : "(0%)"}
                     </span>
                   </div>
                   <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -268,39 +302,62 @@ export function DashboardAnalytics({ analytics }: DashboardAnalyticsProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          {analytics.topSellingSarees.map((saree, idx) => (
-            <div
-              key={saree.name}
-              className="p-4 rounded-xl border border-border bg-muted/20 flex gap-3.5 items-center hover:border-primary/40 transition-colors"
-            >
-              <div className="relative w-14 h-18 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
-                <Image
-                  src={saree.image}
-                  alt={saree.name}
-                  fill
-                  className="object-cover"
-                  sizes="56px"
-                />
-                <span className="absolute top-1 left-1 w-5 h-5 rounded-full bg-background/90 text-[10px] font-bold text-foreground flex items-center justify-center shadow-xs">
-                  #{idx + 1}
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <span className="text-[10px] uppercase font-semibold text-muted-foreground">
-                  {saree.category}
-                </span>
-                <p className="font-bold text-xs text-foreground line-clamp-1 mt-0.5">
-                  {saree.name}
-                </p>
-                <div className="flex items-center justify-between mt-1 text-xs">
-                  <span className="text-muted-foreground">{saree.totalSold} sold</span>
-                  <span className="font-bold text-foreground">{formatPrice(saree.revenue)}</span>
+        {analytics.topSellingSarees && analytics.topSellingSarees.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            {analytics.topSellingSarees.map((saree, idx) => (
+              <div
+                key={saree.name}
+                className="p-4 rounded-xl border border-border bg-muted/20 flex gap-3.5 items-center hover:border-primary/40 transition-colors"
+              >
+                <div className="relative w-14 h-18 rounded-lg overflow-hidden bg-muted flex-shrink-0 border border-border">
+                  <Image
+                    src={saree.image}
+                    alt={saree.name}
+                    fill
+                    className="object-cover"
+                    sizes="56px"
+                  />
+                  <span className="absolute top-1 left-1 w-5 h-5 rounded-full bg-background/90 text-[10px] font-bold text-foreground flex items-center justify-center shadow-xs">
+                    #{idx + 1}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] uppercase font-semibold text-muted-foreground">
+                    {saree.category}
+                  </span>
+                  <p className="font-bold text-xs text-foreground line-clamp-1 mt-0.5">
+                    {saree.name}
+                  </p>
+                  <div className="flex items-center justify-between mt-1 text-xs">
+                    <span className="text-muted-foreground">{saree.totalSold} sold</span>
+                    <span className="font-bold text-foreground">{formatPrice(saree.revenue)}</span>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 rounded-xl border border-dashed border-border bg-muted/20 text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-primary/10 text-primary mx-auto flex items-center justify-center">
+              <Sparkles className="h-6 w-6" />
             </div>
-          ))}
-        </div>
+            <div className="max-w-md mx-auto">
+              <h3 className="text-sm font-bold text-foreground">No Saree Sales Recorded Yet</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Once you list sarees and customers place orders, your best-performing weaves will appear here ranked by volume and revenue.
+              </p>
+            </div>
+            <div className="pt-1">
+              <Link
+                href="/admin/products/new"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shadow-xs"
+              >
+                <Package className="h-3.5 w-3.5" />
+                <span>List First Saree</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
       <CurateShowcaseModal

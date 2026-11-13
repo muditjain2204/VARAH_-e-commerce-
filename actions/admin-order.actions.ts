@@ -142,31 +142,7 @@ export async function getAdminCustomersAction(): Promise<ActionResponse<AdminCus
     console.warn("Database fallback in getAdminCustomersAction:", error);
     return {
       success: true,
-      data: [
-        {
-          id: "customer_demo_1",
-          name: "Priya Sharma",
-          email: "priya.sharma@example.com",
-          phone: "9876543210",
-          avatar: null,
-          orderCount: 2,
-          totalSpent: 44497,
-          lastOrderAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          recentOrders: [
-            {
-              id: "ord_101",
-              orderNumber: "VRH-20260908-1042",
-              status: OrderStatus.CONFIRMED,
-              total: 31498,
-              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-              items: [
-                { name: "Royal Crimson Kanjivaram Pure Silk Saree", sku: "KANJ-CRM-001", price: 18999, quantity: 1, total: 18999, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80" },
-                { name: "Varanasi Antique Gold Banarasi Brocade Saree", sku: "BAN-GLD-002", price: 12499, quantity: 1, total: 12499, image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80" },
-              ],
-            },
-          ],
-        },
-      ],
+      data: [],
     };
   }
 }
@@ -239,71 +215,9 @@ export async function getAdminOrdersAction(): Promise<ActionResponse<AdminOrderL
     return { success: true, data: mapped };
   } catch (error) {
     console.warn("Database fallback in getAdminOrdersAction:", error);
-    // Realistic fallback Indian orders
     return {
       success: true,
-      data: [
-        {
-          id: "ord_101",
-          orderNumber: "VRH-20260908-1042",
-          customerName: "Priya Sharma",
-          customerPhone: "9876543210",
-          customerEmail: "priya.sharma@example.com",
-          itemCount: 2,
-          total: 31498,
-          status: OrderStatus.CONFIRMED,
-          shippingStatus: ShippingStatus.PICKUP_SCHEDULED,
-          courierName: "Delhivery Surface",
-          awbCode: "DLV9842145892IN",
-          paymentMethod: "UPI",
-          createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        },
-        {
-          id: "ord_102",
-          orderNumber: "VRH-20260908-1041",
-          customerName: "Ananya Iyer",
-          customerPhone: "9123456780",
-          customerEmail: "ananya.iyer@example.com",
-          itemCount: 1,
-          total: 12999,
-          status: OrderStatus.SHIPPED,
-          shippingStatus: ShippingStatus.IN_TRANSIT,
-          courierName: "BlueDart Air",
-          awbCode: "BLD5491204812IN",
-          paymentMethod: "CREDIT_CARD",
-          createdAt: new Date(Date.now() - 14 * 60 * 60 * 1000),
-        },
-        {
-          id: "ord_103",
-          orderNumber: "VRH-20260907-1040",
-          customerName: "Sunita Patel",
-          customerPhone: "9988776655",
-          customerEmail: "sunita.p@example.com",
-          itemCount: 1,
-          total: 3500,
-          status: OrderStatus.DELIVERED,
-          shippingStatus: ShippingStatus.DELIVERED,
-          courierName: "Ecom Express",
-          awbCode: "ECM881294012IN",
-          paymentMethod: "COD",
-          createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
-        },
-        {
-          id: "ord_104",
-          orderNumber: "VRH-20260906-1039",
-          customerName: "Meenakshi Sundaram",
-          customerPhone: "9840123456",
-          customerEmail: "meena.s@example.com",
-          itemCount: 3,
-          total: 48900,
-          status: OrderStatus.CONFIRMED,
-          shippingStatus: ShippingStatus.PENDING,
-          courierName: null,
-          awbCode: null,
-          paymentMethod: "NET_BANKING",
-          createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
-        },
-      ],
+      data: [],
     };
   }
 }
@@ -388,64 +302,8 @@ export async function getAdminOrderDetailAction(
   } catch (error) {
     console.warn("Database fallback in getAdminOrderDetailAction:", error);
     return {
-      success: true,
-      data: {
-        id: orderId,
-        orderNumber: "VRH-20260908-1042",
-        userId: "usr_mock",
-        customerName: "Priya Sharma",
-        customerEmail: "priya.sharma@example.com",
-        customerPhone: "9876543210",
-        status: OrderStatus.CONFIRMED,
-        subtotal: 31498,
-        discount: 0,
-        shippingCharge: 0,
-        total: 31498,
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        address: {
-          fullName: "Priya Sharma",
-          phone: "9876543210",
-          addressLine1: "B-402, Lotus Grandeur, Baner Road",
-          addressLine2: "Near D-Mart",
-          city: "Pune",
-          state: "Maharashtra",
-          pincode: "411045",
-        },
-        items: [
-          {
-            id: "item_1",
-            name: "Royal Crimson Kanjivaram Pure Silk Saree",
-            sku: "KANJ-CRM-001",
-            price: 18999,
-            quantity: 1,
-            total: 18999,
-            image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
-          },
-          {
-            id: "item_2",
-            name: "Varanasi Antique Gold Banarasi Brocade Saree",
-            sku: "BAN-GLD-002",
-            price: 12499,
-            quantity: 1,
-            total: 12499,
-            image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80",
-          },
-        ],
-        shipping: {
-          id: "shp_101",
-          awbCode: "DLV9842145892IN",
-          courierName: "Delhivery Surface",
-          status: ShippingStatus.PICKUP_SCHEDULED,
-          labelUrl: "/api/shipping/label?awb=DLV9842145892IN",
-          trackingUrl: "https://shiprocket.co/tracking/DLV9842145892IN",
-          estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
-        },
-        payment: {
-          method: "UPI",
-          status: "CAPTURED",
-          razorpayPaymentId: "pay_PVx8849102",
-        },
-      },
+      success: false,
+      error: "Order details could not be loaded from database",
     };
   }
 }
@@ -521,68 +379,7 @@ export async function getAdminInventoryAction(): Promise<ActionResponse<AdminInv
     console.warn("Database fallback in getAdminInventoryAction:", error);
     return {
       success: true,
-      data: [
-        {
-          variantId: "var_1",
-          productId: "saree_1",
-          productName: "Royal Crimson Kanjivaram Pure Silk Saree",
-          productSku: "KANJ-CRM-001",
-          categoryName: "Silk",
-          imageUrl: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
-          color: "Crimson Red",
-          basePrice: 18999,
-          quantity: 12,
-          reservedQuantity: 1,
-          lowStockThreshold: 5,
-          isLowStock: false,
-          isOutOfStock: false,
-        },
-        {
-          variantId: "var_2",
-          productId: "saree_2",
-          productName: "Varanasi Antique Gold Banarasi Brocade Saree",
-          productSku: "BAN-GLD-002",
-          categoryName: "Banarasi",
-          imageUrl: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80",
-          color: "Gold",
-          basePrice: 14500,
-          quantity: 3,
-          reservedQuantity: 0,
-          lowStockThreshold: 5,
-          isLowStock: true,
-          isOutOfStock: false,
-        },
-        {
-          variantId: "var_3",
-          productId: "saree_3",
-          productName: "Midnight Indigo Chanderi Cotton Saree",
-          productSku: "CHAN-IND-003",
-          categoryName: "Cotton",
-          imageUrl: "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=800&auto=format&fit=crop&q=80",
-          color: "Indigo Blue",
-          basePrice: 4200,
-          quantity: 0,
-          reservedQuantity: 0,
-          lowStockThreshold: 5,
-          isLowStock: false,
-          isOutOfStock: true,
-        },
-        {
-          variantId: "var_4",
-          productId: "saree_4",
-          productName: "Heritage Emerald Organza Saree with Zari Border",
-          productSku: "ORG-EMR-004",
-          categoryName: "Silk",
-          imageUrl: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80",
-          color: "Emerald Green",
-          basePrice: 8900,
-          quantity: 25,
-          reservedQuantity: 2,
-          lowStockThreshold: 5,
-          isLowStock: false,
-          isOutOfStock: false,
-        },
-      ],
+      data: [],
     };
   }
 }
@@ -640,100 +437,129 @@ export async function getAdminAnalyticsAction(): Promise<ActionResponse<AdminAna
     const totalOrders = orders.length;
     const aov = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
 
+    // Calculate real monthly revenue for the last 6 months
+    const monthlyRevenue: { month: string; revenue: number }[] = [];
+    const now = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const monthName = d.toLocaleString("en-US", { month: "short" });
+      const year = d.getFullYear();
+      const monthIndex = d.getMonth();
+
+      const monthRev = orders
+        .filter((o) => {
+          const oDate = new Date(o.createdAt);
+          return oDate.getFullYear() === year && oDate.getMonth() === monthIndex;
+        })
+        .reduce((sum, o) => sum + Number(o.total), 0);
+
+      monthlyRevenue.push({ month: monthName, revenue: monthRev });
+    }
+
+    // Calculate real order distribution by status
+    const deliveredCount = orders.filter((o) => o.status === OrderStatus.DELIVERED).length;
+    const shippedCount = orders.filter(
+      (o) => o.status === OrderStatus.SHIPPED || (o.status as string) === "OUT_FOR_DELIVERY"
+    ).length;
+    const confirmedCount = orders.filter(
+      (o) => o.status === OrderStatus.CONFIRMED || o.status === OrderStatus.PROCESSING
+    ).length;
+    const pendingCount = orders.filter((o) => o.status === OrderStatus.PENDING).length;
+
+    const ordersByStatus = [
+      { status: "Delivered", count: deliveredCount, color: "#10b981" },
+      { status: "Shipped", count: shippedCount, color: "#3b82f6" },
+      { status: "Confirmed", count: confirmedCount, color: "#f59e0b" },
+      { status: "Pending", count: pendingCount, color: "#8b5cf6" },
+    ];
+
+    // Compute genuine top-selling products from order items
+    let topSellingSarees: AdminAnalyticsData["topSellingSarees"] = [];
+    try {
+      const topOrderItems = await prisma.orderItem.groupBy({
+        by: ["productId"],
+        _sum: {
+          quantity: true,
+          total: true,
+        },
+        orderBy: {
+          _sum: {
+            quantity: "desc",
+          },
+        },
+        take: 3,
+      });
+
+      if (topOrderItems.length > 0) {
+        const productIds = topOrderItems.map((item) => item.productId);
+        const productsDetails = await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: {
+            id: true,
+            name: true,
+            category: { select: { name: true } },
+            images: { where: { isPrimary: true }, take: 1, select: { url: true } },
+          },
+        });
+
+        const productMap = new Map(productsDetails.map((p) => [p.id, p]));
+
+        topSellingSarees = topOrderItems
+          .map((item) => {
+            const prod = productMap.get(item.productId);
+            if (!prod) return null;
+            return {
+              name: prod.name,
+              category: prod.category?.name || "Saree",
+              totalSold: item._sum.quantity || 0,
+              revenue: Number(item._sum.total || 0),
+              image: prod.images[0]?.url || "/images/placeholder-saree.jpg",
+            };
+          })
+          .filter((s): s is NonNullable<typeof s> => s !== null);
+      }
+    } catch {
+      topSellingSarees = [];
+    }
+
     return {
       success: true,
       data: {
         totalRevenue,
         totalOrders,
         totalProducts: products,
-        totalCustomers: customersCount || 128,
+        totalCustomers: customersCount || 0,
         averageOrderValue: aov,
-        monthlyRevenue: [
-          { month: "Apr", revenue: 142000 },
-          { month: "May", revenue: 198500 },
-          { month: "Jun", revenue: 235000 },
-          { month: "Jul", revenue: 312000 },
-          { month: "Aug", revenue: 428000 },
-          { month: "Sep", revenue: 512400 },
-        ],
-        ordersByStatus: [
-          { status: "Delivered", count: 42, color: "#10b981" },
-          { status: "Shipped", count: 18, color: "#3b82f6" },
-          { status: "Confirmed", count: 12, color: "#f59e0b" },
-          { status: "Pending", count: 5, color: "#8b5cf6" },
-        ],
-        topSellingSarees: [
-          {
-            name: "Royal Crimson Kanjivaram Pure Silk Saree",
-            category: "Silk",
-            totalSold: 34,
-            revenue: 645966,
-            image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
-          },
-          {
-            name: "Varanasi Antique Gold Banarasi Brocade Saree",
-            category: "Banarasi",
-            totalSold: 28,
-            revenue: 406000,
-            image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80",
-          },
-          {
-            name: "Heritage Emerald Organza Saree",
-            category: "Silk",
-            totalSold: 19,
-            revenue: 169100,
-            image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80",
-          },
-        ],
+        monthlyRevenue,
+        ordersByStatus,
+        topSellingSarees,
       },
     };
   } catch (error) {
     console.warn("Database fallback in getAdminAnalyticsAction:", error);
+    const defaultMonths = [];
+    const n = new Date();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(n.getFullYear(), n.getMonth() - i, 1);
+      defaultMonths.push({ month: d.toLocaleString("en-US", { month: "short" }), revenue: 0 });
+    }
+
     return {
       success: true,
       data: {
-        totalRevenue: 512400,
-        totalOrders: 77,
-        totalProducts: 24,
-        totalCustomers: 142,
-        averageOrderValue: 6654,
-        monthlyRevenue: [
-          { month: "Apr", revenue: 142000 },
-          { month: "May", revenue: 198500 },
-          { month: "Jun", revenue: 235000 },
-          { month: "Jul", revenue: 312000 },
-          { month: "Aug", revenue: 428000 },
-          { month: "Sep", revenue: 512400 },
-        ],
+        totalRevenue: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        totalCustomers: 0,
+        averageOrderValue: 0,
+        monthlyRevenue: defaultMonths,
         ordersByStatus: [
-          { status: "Delivered", count: 42, color: "#10b981" },
-          { status: "Shipped", count: 18, color: "#3b82f6" },
-          { status: "Confirmed", count: 12, color: "#f59e0b" },
-          { status: "Pending", count: 5, color: "#8b5cf6" },
+          { status: "Delivered", count: 0, color: "#10b981" },
+          { status: "Shipped", count: 0, color: "#3b82f6" },
+          { status: "Confirmed", count: 0, color: "#f59e0b" },
+          { status: "Pending", count: 0, color: "#8b5cf6" },
         ],
-        topSellingSarees: [
-          {
-            name: "Royal Crimson Kanjivaram Pure Silk Saree",
-            category: "Silk",
-            totalSold: 34,
-            revenue: 645966,
-            image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80",
-          },
-          {
-            name: "Varanasi Antique Gold Banarasi Brocade Saree",
-            category: "Banarasi",
-            totalSold: 28,
-            revenue: 406000,
-            image: "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?w=800&auto=format&fit=crop&q=80",
-          },
-          {
-            name: "Heritage Emerald Organza Saree",
-            category: "Silk",
-            totalSold: 19,
-            revenue: 169100,
-            image: "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop&q=80",
-          },
-        ],
+        topSellingSarees: [],
       },
     };
   }
