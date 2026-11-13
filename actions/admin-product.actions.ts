@@ -206,10 +206,33 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
       }
     }
 
-    const finalImageUrl =
+    let finalImageUrl =
       input.imageUrl && input.imageUrl.trim().length > 0
         ? input.imageUrl
         : "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop&q=80";
+    let publicId = `img_${Date.now()}`;
+
+    // Upload base64 data to Cloudinary when configured
+    if (finalImageUrl.startsWith("data:image/") && process.env.CLOUDINARY_API_KEY) {
+      try {
+        const { v2: cloudinary } = await import("cloudinary");
+        cloudinary.config({
+          cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+          api_key: process.env.CLOUDINARY_API_KEY,
+          api_secret: process.env.CLOUDINARY_API_SECRET,
+          secure: true,
+        });
+        const uploadRes = await cloudinary.uploader.upload(finalImageUrl, {
+          folder: "maalaxmi_products",
+        });
+        if (uploadRes?.secure_url) {
+          finalImageUrl = uploadRes.secure_url;
+          publicId = uploadRes.public_id;
+        }
+      } catch (uploadErr) {
+        console.warn("Cloudinary upload fallback:", uploadErr);
+      }
+    }
 
     const finalDescription =
       input.description && input.description.trim().length > 0
@@ -235,7 +258,7 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
           create: [
             {
               url: finalImageUrl,
-              publicId: `img_${Date.now()}`,
+              publicId,
               isPrimary: true,
             },
           ],
@@ -262,9 +285,13 @@ export async function createProductAction(input: CreateProductInput): Promise<Ac
       },
     });
 
-    revalidatePath("/products");
-    revalidatePath("/admin/products");
-    revalidatePath("/");
+    try {
+      revalidatePath("/products");
+      revalidatePath("/admin/products");
+      revalidatePath("/");
+    } catch (revalErr) {
+      console.warn("revalidatePath warning:", revalErr);
+    }
     return { success: true, data: true };
   } catch (e: unknown) {
     console.error("Database create product error:", e);

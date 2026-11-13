@@ -61,18 +61,47 @@ export default function NewProductPage() {
   const handleImageUpload = (file: File | undefined) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
+      toast.error("Please select an image file (PNG, JPG, WebP)");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be smaller than 5MB");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image must be smaller than 10MB");
       return;
     }
+
     const reader = new FileReader();
-    reader.onload = () => {
-      const url = String(reader.result);
-      setImagePreview(url);
-      setFormData((current) => ({ ...current, imageUrl: url }));
+    reader.onload = (e) => {
+      const img = document.createElement("img");
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 900;
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.84);
+        setImagePreview(compressedDataUrl);
+        setFormData((current) => ({ ...current, imageUrl: compressedDataUrl }));
+        toast.success("Photo optimized and selected!");
+      };
+      img.src = String(e.target?.result);
     };
     reader.readAsDataURL(file);
   };
@@ -98,8 +127,10 @@ export default function NewProductPage() {
       } else {
         toast.error(res.error || "Failed to create product");
       }
-    } catch {
-      toast.error("Error publishing saree product");
+    } catch (err: unknown) {
+      console.error("Create product failed:", err);
+      const msg = err instanceof Error ? err.message : "Error publishing saree product";
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
