@@ -348,20 +348,18 @@ export function Navbar() {
               )}
             </Link>
 
-            {/* Profile / Account Icon */}
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button
-                  type="button"
-                  className="p-2 text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors"
-                  title="Sign In / Account"
-                  aria-label="Account"
-                >
-                  <User className="h-5 w-5" />
-                </button>
-              </SignInButton>
+            {/* Admin Portal Button */}
+            <Link
+              href="/admin"
+              className="p-2 text-foreground/70 hover:text-primary rounded-md hover:bg-accent transition-colors relative"
+              title="Admin Portal"
+              aria-label="Admin Portal"
+            >
+              <User className="h-5 w-5" />
+            </Link>
 
-              {/* Signature Brand Brown / Maroon Auth Action Buttons */}
+            {/* Customer Sign In / Sign Up (Brand Brown Color) */}
+            <Show when="signed-out">
               <div className="hidden sm:flex items-center gap-1.5 ml-0.5">
                 <SignInButton mode="modal">
                   <button
@@ -383,14 +381,6 @@ export function Navbar() {
             </Show>
 
             <Show when="signed-in">
-              <Link
-                href="/account/profile"
-                className="p-2 text-foreground/70 hover:text-foreground rounded-md hover:bg-accent transition-colors"
-                title="My Profile"
-                aria-label="Profile Viewer"
-              >
-                <User className="h-5 w-5" />
-              </Link>
               <UserButton
                 appearance={{
                   elements: {
@@ -612,12 +602,12 @@ export function Navbar() {
                   <span>My Profile</span>
                 </Link>
                 <Link
-                  href="/account/orders"
+                  href="/admin"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-amber-400 hover:text-amber-300 hover:bg-stone-800/60 rounded-lg transition-colors font-medium"
                 >
-                  <Package className="h-4 w-4 text-amber-400" />
-                  <span>My Orders</span>
+                  <User className="h-4 w-4 text-amber-400" />
+                  <span>Admin Portal</span>
                 </Link>
               </div>
             </div>

@@ -73,7 +73,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      localization={{
+        signIn: {
+          start: {
+            title: "Sign in to MAA LAXMI",
+            subtitle: "Welcome back! Please sign in to continue",
+          },
+        },
+        signUp: {
+          start: {
+            title: "Create your MAA LAXMI account",
+            subtitle: "Welcome! Please fill in your details to get started",
+          },
+        },
+      }}
+      appearance={{
+        variables: {
+          colorPrimary: "#8b1a1a",
+          borderRadius: "0.75rem",
+        },
+        elements: {
+          card: "shadow-2xl border border-stone-200/80 rounded-2xl",
+          formButtonPrimary: "bg-[#8b1a1a] hover:bg-[#721515] text-white font-semibold transition-all shadow-sm",
+        },
+      }}
+    >
       <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
         <body className="min-h-screen bg-background font-sans antialiased">
           <WishlistProvider>
