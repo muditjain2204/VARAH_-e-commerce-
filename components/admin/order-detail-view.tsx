@@ -42,10 +42,10 @@ interface OrderDetailViewProps {
 }
 
 const COURIER_OPTIONS = [
-  "Delhivery Surface",
-  "Delhivery Express",
-  "BlueDart Air",
+  "Delhivery Direct (Surface)",
+  "Delhivery Direct (Express)",
   "DTDC Express",
+  "BlueDart Air",
   "India Post Speed Post",
   "Ecom Express Surface",
   "Shadowfax",
@@ -63,16 +63,35 @@ export function OrderDetailView({ initialOrder }: OrderDetailViewProps) {
   const [isFulfillModalOpen, setIsFulfillModalOpen] = useState(false);
   const [courierName, setCourierName] = useState(COURIER_OPTIONS[0]);
   const [awbCode, setAwbCode] = useState("");
-  const [isManual, setIsManual] = useState(false);
+  const [isManual, setIsManual] = useState(true); // Default to Direct Delhivery fulfillment
   const [weight, setWeight] = useState(
     (0.8 * Math.max(1, order.items.length)).toFixed(1)
   );
   const [estDeliveryDays, setEstDeliveryDays] = useState(4);
 
   const generateRandomAwb = () => {
-    const randomAwb = `VRH${Math.floor(100000000 + Math.random() * 900000000)}IN`;
+    // Generate standard 12-digit Delhivery Waybill / AWB code
+    const randomAwb = Math.floor(100000000000 + Math.random() * 900000000000).toString();
     setAwbCode(randomAwb);
-    toast.info(`Generated AWB: ${randomAwb}`);
+    toast.info(`Generated Delhivery AWB: ${randomAwb}`);
+  };
+
+  const copyDelhiveryBookingInfo = () => {
+    const info = `Customer: ${order.address?.fullName || "Valued Customer"}
+Phone: ${order.address?.phone || ""}
+Address: ${order.address?.addressLine1 || ""}, ${order.address?.addressLine2 || ""}
+City: ${order.address?.city || ""}
+State: ${order.address?.state || ""}
+Pincode: ${order.address?.pincode || ""}
+Order Ref: ${order.orderNumber}
+Product: Handcrafted Saree (${order.items.length} pcs)
+Package Weight: ${weight} kg
+Value: ₹${order.total}`;
+
+    navigator.clipboard.writeText(info);
+    toast.success("Delivery details copied! Paste directly into Delhivery Direct app.", {
+      id: "copy-delhivery-info",
+    });
   };
 
   const handleShipOrder = async () => {
@@ -188,12 +207,16 @@ export function OrderDetailView({ initialOrder }: OrderDetailViewProps) {
   const publicTrackingUrl = `https://maalaxmistore.vercel.app/track?order=${order.orderNumber}`;
 
   const whatsappDispatchMessage = encodeURIComponent(
-    `Namaste ${order.address?.fullName || "ji"}! 🙏\n\nYour handcrafted saree order #${order.orderNumber} has been dispatched with utmost care from our Varanasi workshop!\n\n🚚 Courier: ${order.shipping?.courierName || "Delhivery Surface"}\n📦 AWB Tracking No: ${order.shipping?.awbCode || "Assigned"}\n📍 Live Tracking: ${publicTrackingUrl}\n\nThank you for choosing MAA LAXMI Sarees. We hope you cherish every weave!`
+    `Namaste ${order.address?.fullName || "ji"}! 🙏\n\nYour handcrafted saree order #${order.orderNumber} has been safely dispatched from our Varanasi workshop!\n\n🚚 Courier Partner: ${order.shipping?.courierName || "Delhivery Direct"}\n📦 Waybill / AWB Code: ${order.shipping?.awbCode || "Assigned"}\n🔒 Delivery Handover: OTP Verified at Doorstep\n📍 Live Tracking Link: ${publicTrackingUrl}\n\nThank you for choosing MAA LAXMI Sarees. Please feel free to reply if you need any assistance!`
   );
 
   const whatsappDeliveryMessage = encodeURIComponent(
     `Namaste ${order.address?.fullName || "ji"}! 🙏\n\nYour MAA LAXMI handcrafted saree order #${order.orderNumber} has been marked as DELIVERED to your address!\n\nWe hope you love your saree. If you have any feedback or questions, please reply directly to this chat.\n\nWarm regards,\nMAA LAXMI Sarees, Varanasi`
   );
+
+  const courierPortalUrl = order.shipping?.courierName?.toLowerCase().includes("delhivery")
+    ? `https://www.delhivery.com/track/package/${order.shipping.awbCode}`
+    : order.shipping?.trackingUrl || `https://shiprocket.co/tracking/${order.shipping?.awbCode}`;
 
   return (
     <div className="space-y-6">
@@ -347,7 +370,7 @@ export function OrderDetailView({ initialOrder }: OrderDetailViewProps) {
                 </>
               )}
               <a
-                href={order.shipping.trackingUrl || `https://shiprocket.co/tracking/${order.shipping.awbCode}`}
+                href={courierPortalUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 px-3 py-1.5 border border-border text-xs font-semibold text-foreground rounded-lg hover:bg-accent transition-colors"
@@ -495,6 +518,17 @@ export function OrderDetailView({ initialOrder }: OrderDetailViewProps) {
                 <p className="font-mono text-foreground pt-1">Phone: +91 {order.address.phone}</p>
                 <p className="text-muted-foreground">Email: {order.customerEmail}</p>
               </div>
+
+              <div className="pt-2 border-t border-border">
+                <button
+                  type="button"
+                  onClick={copyDelhiveryBookingInfo}
+                  className="w-full py-2 px-3 bg-primary/10 hover:bg-primary/20 text-primary text-xs font-semibold rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  <span>Copy for Delhivery Direct App</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -609,6 +643,38 @@ export function OrderDetailView({ initialOrder }: OrderDetailViewProps) {
                   ))}
                 </select>
               </div>
+
+              {/* Delhivery Direct Fast-Booking Helper */}
+              {isManual && courierName.toLowerCase().includes("delhivery") && (
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                      <Truck className="h-4 w-4 text-amber-600" /> Delhivery Direct 1-Click Pickup
+                    </span>
+                    <a
+                      href="https://direct.delhivery.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-bold text-primary hover:underline flex items-center gap-1"
+                    >
+                      <span>direct.delhivery.com ↗</span>
+                    </a>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    1. Tap button below to copy consignee & saree package details.<br />
+                    2. Book doorstep pickup on the Delhivery Direct app or web.<br />
+                    3. Paste the generated 12-digit Waybill number below.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={copyDelhiveryBookingInfo}
+                    className="w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer active:scale-98"
+                  >
+                    <Copy className="h-3.5 w-3.5" />
+                    <span>Copy Booking Info for Delhivery App</span>
+                  </button>
+                </div>
+              )}
 
               {/* AWB Code */}
               <div>

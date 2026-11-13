@@ -289,8 +289,23 @@ export function PublicTracker() {
                 </p>
                 <p className="text-sm font-bold text-foreground mt-1 flex items-center gap-1.5">
                   <Truck className="h-4 w-4 text-primary" />
-                  <span>{data.order.shipping?.courierName || "Delhivery Surface"}</span>
+                  <span>{data.order.shipping?.courierName || "Delhivery Direct"}</span>
                 </p>
+                {data.order.shipping?.awbCode && (
+                  <a
+                    href={
+                      data.order.shipping.courierName?.toLowerCase().includes("delhivery")
+                        ? `https://www.delhivery.com/track/package/${data.order.shipping.awbCode}`
+                        : data.order.shipping.trackingUrl || `https://shiprocket.co/tracking/${data.order.shipping.awbCode}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline mt-1"
+                  >
+                    <span>Check on Official Portal</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
               </div>
 
               <div>
@@ -465,3 +480,4 @@ export function PublicTracker() {
     </div>
   );
 }
+

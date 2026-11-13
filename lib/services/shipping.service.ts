@@ -68,17 +68,17 @@ export async function createShipmentForOrder(
     let shiprocketOrderId = "";
     let labelUrl = `/api/shipping/label?orderId=${order.id}`;
 
-    // Mode A: Direct / Manual Courier Dispatch (DTDC, BlueDart, Delhivery, India Post, etc.)
+    // Mode A: Direct / Manual Courier Dispatch (Delhivery Direct, DTDC, BlueDart, etc.)
     if (options?.isManual) {
-      courierName = options.courierName || "Delhivery Surface";
+      courierName = options.courierName || "Delhivery Direct (Surface)";
       awbCode =
         options.awbCode && options.awbCode.trim().length > 0
           ? options.awbCode.trim().toUpperCase()
-          : `VRH${Math.floor(100000000 + Math.random() * 900000000)}IN`;
-      shipmentIdStr = `SHP_${Math.floor(100000 + Math.random() * 900000)}`;
+          : Math.floor(100000000000 + Math.random() * 900000000000).toString(); // Standard 12-digit Delhivery Waybill
+      shipmentIdStr = `DLV_${Math.floor(100000 + Math.random() * 900000)}`;
       shiprocketOrderId = `MNL_${Date.now()}`;
     } else {
-      // Mode B: Automated Shiprocket Logistics
+      // Mode B: Automated Logistics
       const orderItems = order.items.map((item) => ({
         name: item.name,
         sku: item.sku,
@@ -110,7 +110,7 @@ export async function createShipmentForOrder(
 
       const awbResult = await assignCourierAwb(
         shipmentIdStr,
-        options?.courierName || shiprocketOrder.courier_name
+        options?.courierName || "Delhivery Direct"
       );
 
       awbCode = awbResult.awb_code;
@@ -122,7 +122,9 @@ export async function createShipmentForOrder(
       }
     }
 
-    const trackingUrl = `https://shiprocket.co/tracking/${awbCode}`;
+    const trackingUrl = courierName.toLowerCase().includes("delhivery")
+      ? `https://www.delhivery.com/track/package/${awbCode}`
+      : `https://shiprocket.co/tracking/${awbCode}`;
 
     // Step 4: Persist in Prisma Shipping table
     const shipping = await prisma.shipping.upsert({
