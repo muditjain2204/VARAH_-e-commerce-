@@ -6,13 +6,19 @@ import {
   MapPin,
   Heart,
   User,
+  Ticket,
+  Gift,
+  Bell,
 } from "lucide-react";
 
 const accountLinks = [
   { label: "Dashboard", href: "/account", icon: LayoutDashboard },
   { label: "My Orders", href: "/account/orders", icon: Package },
-  { label: "Addresses", href: "/account/addresses", icon: MapPin },
+  { label: "Coupons", href: "/account/coupons", icon: Ticket },
+  { label: "Saved Addresses", href: "/account/addresses", icon: MapPin },
   { label: "Wishlist", href: "/account/wishlist", icon: Heart },
+  { label: "Gift Cards", href: "/account/gift-cards", icon: Gift },
+  { label: "Notifications", href: "/account/notifications", icon: Bell },
   { label: "Profile", href: "/account/profile", icon: User },
 ];
 

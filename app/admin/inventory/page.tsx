@@ -1,6 +1,9 @@
 import { getAdminInventoryAction } from "@/actions/admin-order.actions";
 import { InventoryManager } from "@/components/admin/inventory-manager";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Inventory & Stock Alerts | Varah Admin",
 };

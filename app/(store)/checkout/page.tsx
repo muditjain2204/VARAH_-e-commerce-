@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 import {
   ShieldCheck,
   Truck,
@@ -33,6 +34,7 @@ declare global {
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, discount, shipping, total, appliedCoupon, clearCart } = useCart();
+  const { user: clerkUser, isLoaded: isUserLoaded } = useUser();
 
   const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "COD">("ONLINE");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,6 +51,20 @@ export default function CheckoutPage() {
   const [pincode, setPincode] = useState("");
   const [landmark, setLandmark] = useState("");
   const [notes, setNotes] = useState("");
+
+  // Auto-prefill customer info if logged in
+  useEffect(() => {
+    if (isUserLoaded && clerkUser) {
+      if (!fullName) {
+        const name = clerkUser.fullName || `${clerkUser.firstName || ""} ${clerkUser.lastName || ""}`.trim();
+        if (name) setFullName(name);
+      }
+      if (!email) {
+        const mail = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress;
+        if (mail) setEmail(mail);
+      }
+    }
+  }, [isUserLoaded, clerkUser]);
 
   // Load Razorpay Script
   useEffect(() => {

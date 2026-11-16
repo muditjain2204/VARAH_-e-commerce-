@@ -1,6 +1,9 @@
 import { getAdminProductsAction } from "@/actions/admin-product.actions";
 import { ProductsManager, AdminProduct } from "@/components/admin/products-manager";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Products Management | Varah Admin",
   description: "Manage sarees, update prices, change availability tags, and control inventory.",

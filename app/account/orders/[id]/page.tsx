@@ -16,11 +16,14 @@ import { formatPrice } from "@/lib/utils";
 
 import { RealtimeTracking } from "@/components/store/realtime-tracking";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface OrderDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-export const metadata = { title: "Order Details | Varah Store" };
+export const metadata = { title: "Order Details | MAA LAXMI" };
 
 export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
   const { id } = await params;

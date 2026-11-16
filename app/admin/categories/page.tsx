@@ -1,6 +1,9 @@
 import { getAdminCategoriesAction } from "@/actions/admin-category.actions";
 import { CategoriesManager } from "@/components/admin/categories-manager";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Categories Management | Varah Admin",
   description: "Organize saree weaves, silk collections, and handloom categories.",

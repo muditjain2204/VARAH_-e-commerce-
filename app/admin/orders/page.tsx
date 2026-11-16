@@ -1,6 +1,9 @@
 import { getAdminOrdersAction } from "@/actions/admin-order.actions";
 import { OrdersManager } from "@/components/admin/orders-manager";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Orders Management | Varah Admin",
   description: "Fulfill customer orders, assign couriers, and generate shipping labels.",

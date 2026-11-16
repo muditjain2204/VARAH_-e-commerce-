@@ -8,6 +8,8 @@ import {
   SignUpButton,
   Show,
   UserButton,
+  useUser,
+  useClerk,
 } from "@clerk/nextjs";
 import {
   Search,
@@ -21,6 +23,13 @@ import {
   IndianRupee,
   Sliders,
   Sparkles,
+  Ticket,
+  MapPin,
+  Gift,
+  Bell,
+  LogOut,
+  ShieldCheck,
+  ChevronRight,
 } from "lucide-react";
 import {
   NAV_LINKS,
@@ -41,6 +50,7 @@ export function Navbar() {
   // Dropdown states
   const [isCategoriesDropdownOpen, setIsCategoriesDropdownOpen] = useState(false);
   const [isPriceDropdownOpen, setIsPriceDropdownOpen] = useState(false);
+  const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
 
   // Custom price in top bar dropdown
   const [navbarMinPrice, setNavbarMinPrice] = useState("");
@@ -48,9 +58,13 @@ export function Navbar() {
 
   const categoriesRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
+  const accountRef = useRef<HTMLDivElement>(null);
 
   const { itemCount: cartCount } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
+
+  const { isSignedIn, user: clerkUser } = useUser();
+  const { signOut } = useClerk();
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -66,6 +80,12 @@ export function Navbar() {
         !priceRef.current.contains(event.target as Node)
       ) {
         setIsPriceDropdownOpen(false);
+      }
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(event.target as Node)
+      ) {
+        setIsAccountDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -348,18 +368,203 @@ export function Navbar() {
               )}
             </Link>
 
-            {/* Admin Portal Button */}
+            {/* Store Admin Shortcut for Owner */}
             <Link
               href="/admin"
-              className="p-2 text-foreground/70 hover:text-primary rounded-md hover:bg-accent transition-colors relative"
-              title="Admin Portal"
-              aria-label="Admin Portal"
+              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 transition-colors whitespace-nowrap"
+              title="Store Admin Dashboard"
             >
-              <User className="h-5 w-5" />
+              <ShieldCheck className="h-3.5 w-3.5" />
+              <span>Admin</span>
             </Link>
 
-            {/* Customer Sign In / Sign Up (Brand Brown Color) */}
-            <Show when="signed-out">
+            {/* Flipkart-Style Account Dropdown */}
+            <div
+              className="relative"
+              ref={accountRef}
+              onMouseEnter={() => setIsAccountDropdownOpen(true)}
+              onMouseLeave={() => setIsAccountDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setIsAccountDropdownOpen(!isAccountDropdownOpen)}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  isAccountDropdownOpen
+                    ? "bg-accent text-foreground ring-1 ring-border"
+                    : "text-foreground/80 hover:text-foreground hover:bg-accent"
+                }`}
+                aria-expanded={isAccountDropdownOpen}
+              >
+                <User className="h-4 w-4" />
+                <span>{isSignedIn && clerkUser ? (clerkUser.firstName || "Account") : "Account"}</span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                    isAccountDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {isAccountDropdownOpen && (
+                <div className="absolute right-0 top-full pt-1.5 w-64 z-50 animate-in fade-in-50 zoom-in-95">
+                  <div className="bg-popover text-popover-foreground border border-border rounded-2xl shadow-2xl overflow-hidden divide-y divide-border">
+                    {/* Header */}
+                    {isSignedIn && clerkUser ? (
+                      <div className="px-4 py-3 bg-muted/40 flex items-center justify-between">
+                        <div className="min-w-0">
+                          <p className="text-[11px] text-muted-foreground">Welcome back,</p>
+                          <p className="text-xs font-bold text-foreground truncate">
+                            {clerkUser.fullName || clerkUser.firstName || "Customer"}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground truncate">
+                            {clerkUser.primaryEmailAddress?.emailAddress || ""}
+                          </p>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20 shrink-0">
+                          Customer
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="px-4 py-3 bg-muted/40">
+                        <p className="text-xs font-bold text-foreground">Welcome to MAA LAXMI</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 mb-2.5">
+                          To access your orders and account features
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <SignInButton mode="modal">
+                            <button
+                              type="button"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="flex-1 py-1.5 px-3 bg-primary text-primary-foreground text-xs font-bold rounded-lg hover:bg-primary/90 transition-all text-center"
+                            >
+                              Sign In
+                            </button>
+                          </SignInButton>
+                          <SignUpButton mode="modal">
+                            <button
+                              type="button"
+                              onClick={() => setIsAccountDropdownOpen(false)}
+                              className="flex-1 py-1.5 px-3 border border-border text-foreground hover:bg-accent text-xs font-semibold rounded-lg transition-all text-center"
+                            >
+                              Sign Up
+                            </button>
+                          </SignUpButton>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Flipkart Menu Items */}
+                    <div className="py-1">
+                      <Link
+                        href="/account/profile"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <span>My Profile</span>
+                      </Link>
+
+                      <Link
+                        href="/account/orders"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center justify-between px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Package className="h-4 w-4 text-primary" />
+                          <span className="font-bold text-primary">Orders</span>
+                        </div>
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
+                      </Link>
+
+                      <Link
+                        href="/account/coupons"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <Ticket className="h-4 w-4 text-muted-foreground" />
+                        <span>Coupons</span>
+                      </Link>
+
+                      <Link
+                        href="/account/addresses"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span>Saved Addresses</span>
+                      </Link>
+
+                      <Link
+                        href="/account/wishlist"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center justify-between px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Heart className="h-4 w-4 text-muted-foreground" />
+                          <span>Wishlist</span>
+                        </div>
+                        {wishlistCount > 0 && (
+                          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-primary text-primary-foreground">
+                            {wishlistCount}
+                          </span>
+                        )}
+                      </Link>
+
+                      <Link
+                        href="/account/gift-cards"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <Gift className="h-4 w-4 text-muted-foreground" />
+                        <span>Gift Cards</span>
+                      </Link>
+
+                      <Link
+                        href="/account/notifications"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-foreground hover:bg-accent hover:text-primary transition-colors"
+                      >
+                        <Bell className="h-4 w-4 text-muted-foreground" />
+                        <span>Notifications</span>
+                      </Link>
+                    </div>
+
+                    {/* Store Admin & Logout */}
+                    <div className="py-1 bg-muted/20">
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsAccountDropdownOpen(false)}
+                        className="flex items-center justify-between px-4 py-2 text-xs font-semibold text-amber-700 dark:text-amber-400 hover:bg-amber-500/10 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <ShieldCheck className="h-4 w-4" />
+                          <span>Store Admin Portal</span>
+                        </div>
+                        <span className="text-[10px] uppercase tracking-wider font-bold bg-amber-500/20 px-1.5 py-0.5 rounded">
+                          Owner
+                        </span>
+                      </Link>
+
+                      {isSignedIn && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsAccountDropdownOpen(false);
+                            signOut(() => router.push("/"));
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-xs font-medium text-rose-600 hover:bg-rose-500/10 transition-colors text-left"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          <span>Logout</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Sign In button for guests in brand brown */}
+            {!isSignedIn && (
               <div className="hidden sm:flex items-center gap-1.5 ml-0.5">
                 <SignInButton mode="modal">
                   <button
@@ -369,26 +574,8 @@ export function Navbar() {
                     Sign In
                   </button>
                 </SignInButton>
-                <SignUpButton mode="modal">
-                  <button
-                    type="button"
-                    className="px-3 xl:px-3.5 py-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg shadow-xs transition-all whitespace-nowrap active:scale-95"
-                  >
-                    Sign Up
-                  </button>
-                </SignUpButton>
               </div>
-            </Show>
-
-            <Show when="signed-in">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "h-8 w-8",
-                  },
-                }}
-              />
-            </Show>
+            )}
           </div>
         </div>
 
@@ -591,14 +778,75 @@ export function Navbar() {
                 </div>
               </div>
 
-              {/* Account Quick Links */}
+              {/* Account Quick Links (Flipkart-Style) */}
               <div className="pt-4 border-t border-stone-800 space-y-1">
+                <h4 className="text-amber-400 text-xs font-bold tracking-wider uppercase mb-2 px-3">
+                  Account & Orders
+                </h4>
+                <Link
+                  href="/account/orders"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 text-sm text-stone-200 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Package className="h-4 w-4 text-amber-400" />
+                    <span className="font-semibold text-amber-300">My Orders</span>
+                  </div>
+                  <ChevronRight className="h-3.5 w-3.5 text-stone-500" />
+                </Link>
+                <Link
+                  href="/account/coupons"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                >
+                  <Ticket className="h-4 w-4 text-stone-400" />
+                  <span>Coupons</span>
+                </Link>
+                <Link
+                  href="/account/addresses"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                >
+                  <MapPin className="h-4 w-4 text-stone-400" />
+                  <span>Saved Addresses</span>
+                </Link>
+                <Link
+                  href="/account/wishlist"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Heart className="h-4 w-4 text-stone-400" />
+                    <span>Wishlist</span>
+                  </div>
+                  {wishlistCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-400 text-stone-950">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/account/gift-cards"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                >
+                  <Gift className="h-4 w-4 text-stone-400" />
+                  <span>Gift Cards</span>
+                </Link>
+                <Link
+                  href="/account/notifications"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
+                >
+                  <Bell className="h-4 w-4 text-stone-400" />
+                  <span>Notifications</span>
+                </Link>
                 <Link
                   href="/account/profile"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 text-sm text-stone-300 hover:text-white hover:bg-stone-800/60 rounded-lg transition-colors"
                 >
-                  <User className="h-4 w-4 text-amber-400" />
+                  <User className="h-4 w-4 text-stone-400" />
                   <span>My Profile</span>
                 </Link>
                 <Link
@@ -606,9 +854,22 @@ export function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="flex items-center gap-2.5 px-3 py-2 text-sm text-amber-400 hover:text-amber-300 hover:bg-stone-800/60 rounded-lg transition-colors font-medium"
                 >
-                  <User className="h-4 w-4 text-amber-400" />
-                  <span>Admin Portal</span>
+                  <ShieldCheck className="h-4 w-4 text-amber-400" />
+                  <span>Store Admin Portal</span>
                 </Link>
+                {isSignedIn && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      signOut(() => router.push("/"));
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-rose-400 hover:text-rose-300 hover:bg-stone-800/60 rounded-lg transition-colors text-left"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -71,8 +71,13 @@ export async function createOrder(params: CreateOrderParams) {
       : null;
 
     if (!user) {
-      // Find by email or create guest customer
-      user = await prisma.user.findUnique({ where: { email: customer.email } });
+      const normalizedEmail = customer.email.trim().toLowerCase();
+      // Find by email (case-insensitive) or create customer
+      user = await prisma.user.findFirst({
+        where: {
+          email: { equals: normalizedEmail, mode: "insensitive" },
+        },
+      });
       if (!user) {
         const nameParts = customer.fullName.trim().split(" ");
         const firstName = nameParts[0] || "Customer";
@@ -80,7 +85,7 @@ export async function createOrder(params: CreateOrderParams) {
 
         user = await prisma.user.create({
           data: {
-            email: customer.email,
+            email: normalizedEmail,
             firstName,
             lastName,
             phone: customer.phone,

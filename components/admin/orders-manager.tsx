@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Package,
@@ -13,10 +13,12 @@ import {
   ExternalLink,
   ChevronRight,
   Filter,
+  RefreshCw,
 } from "lucide-react";
 import {
   AdminOrderListItem,
   updateOrderStatusAction,
+  getAdminOrdersAction,
 } from "@/actions/admin-order.actions";
 import { formatPrice } from "@/lib/utils";
 import { OrderStatus } from "@prisma/client";
@@ -30,6 +32,33 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
   const [orders, setOrders] = useState<AdminOrderListItem[]>(initialOrders);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string>("ALL");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Sync fresh orders on mount
+  useEffect(() => {
+    getAdminOrdersAction().then((res) => {
+      if (res.success && res.data) {
+        setOrders(res.data);
+      }
+    });
+  }, []);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await getAdminOrdersAction();
+      if (res.success && res.data) {
+        setOrders(res.data);
+        toast.success(`Synced ${res.data.length} orders from store database`);
+      } else {
+        toast.error("Could not sync orders");
+      }
+    } catch {
+      toast.error("Error connecting to database");
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const filteredOrders = orders.filter((o) => {
     const matchesSearch =
@@ -88,6 +117,17 @@ export function OrdersManager({ initialOrders }: OrdersManagerProps) {
           <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Dispatch orders, assign Shiprocket couriers, print labels, and monitor shipment milestones.
           </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-border bg-card hover:bg-accent text-foreground transition-all shadow-xs disabled:opacity-50"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? "animate-spin text-primary" : ""}`} />
+            <span>{isRefreshing ? "Syncing..." : "Sync Live Orders"}</span>
+          </button>
         </div>
       </div>
 

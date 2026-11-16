@@ -1,6 +1,9 @@
 import { getAdminCouponsAction } from "@/actions/admin-coupon.actions";
 import { CouponsManager } from "@/components/admin/coupons-manager";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Coupon & Discount Management | Varah Admin",
   description: "Create and manage promotional discount codes, validity windows, and usage caps.",

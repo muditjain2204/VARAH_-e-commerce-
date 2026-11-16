@@ -1,6 +1,9 @@
 import { getAdminAnalyticsAction } from "@/actions/admin-order.actions";
 import { DashboardAnalytics } from "@/components/admin/dashboard-analytics";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata = {
   title: "Admin Dashboard & Revenue Analytics | Varah",
   description: "Sales, revenue trends, fulfillment, and customer metrics for Varah store.",
