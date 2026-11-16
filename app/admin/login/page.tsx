@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ShieldCheck,
   Lock,
@@ -54,8 +55,18 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex flex-col justify-between bg-gradient-to-b from-background via-muted/20 to-background p-4 md:p-8">
       {/* Top Brand Header */}
       <div className="flex items-center justify-between max-w-md w-full mx-auto">
-        <Link href="/" className="font-playfair text-xl font-bold text-foreground">
-          MAA LAXMI <span className="text-xs font-sans font-normal text-muted-foreground">Admin Portal</span>
+        <Link href="/" className="font-playfair text-xl font-bold text-foreground flex items-center gap-2">
+          <div className="relative h-8 w-8 rounded-full overflow-hidden border border-amber-500/40 shadow-xs flex-shrink-0 bg-[#260106]">
+            <Image
+              src="/icon.png"
+              alt="MAA LAXMI Logo"
+              width={32}
+              height={32}
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <span>MAA LAXMI</span>
+          <span className="text-xs font-sans font-normal text-muted-foreground ml-1">Admin Portal</span>
         </Link>
         <Link
           href="/"

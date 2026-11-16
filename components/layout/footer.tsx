@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FOOTER_LINKS } from "@/constants";
 
 export function Footer() {
@@ -12,9 +13,18 @@ export function Footer() {
           <div className="space-y-4">
             <Link
               href="/"
-              className="font-playfair text-2xl font-bold tracking-tight text-foreground hover:text-primary transition-colors"
+              className="font-playfair text-2xl font-bold tracking-tight text-foreground hover:text-primary transition-colors flex items-center gap-2.5"
             >
-              MAA LAXMI
+              <div className="relative h-10 w-10 rounded-full overflow-hidden border border-amber-500/40 shadow-xs flex-shrink-0 bg-[#260106]">
+                <Image
+                  src="/icon.png"
+                  alt="MAA LAXMI Logo"
+                  width={40}
+                  height={40}
+                  className="object-cover w-full h-full"
+                />
+              </div>
+              <span>MAA LAXMI</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Premium handcrafted Indian sarees from the finest weavers across

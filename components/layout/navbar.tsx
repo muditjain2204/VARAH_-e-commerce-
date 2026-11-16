@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -146,9 +147,19 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex-shrink-0 font-playfair text-xl sm:text-2xl font-bold tracking-tight text-foreground hover:text-primary transition-colors flex items-center gap-1.5 mr-1"
+            className="flex-shrink-0 font-playfair text-xl sm:text-2xl font-bold tracking-tight text-foreground hover:text-primary transition-colors flex items-center gap-2 mr-1"
           >
-            <span>MAA LAXMI</span>
+            <div className="relative h-9 w-9 rounded-full overflow-hidden border border-amber-500/40 shadow-xs flex-shrink-0 bg-[#260106]">
+              <Image
+                src="/icon.png"
+                alt="MAA LAXMI Logo"
+                width={36}
+                height={36}
+                className="object-cover w-full h-full"
+                priority
+              />
+            </div>
+            <span className="whitespace-nowrap font-playfair font-bold">MAA LAXMI</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -613,9 +624,20 @@ export function Navbar() {
           <div className="fixed inset-y-0 left-0 w-[300px] max-w-[85vw] bg-[#12141a] text-stone-200 shadow-2xl flex flex-col z-10 border-r border-stone-800 animate-in slide-in-from-left duration-200 overflow-hidden">
             {/* Drawer Header with Brand & Close */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800">
-              <span className="font-playfair text-xl font-bold tracking-wider text-amber-400">
-                MAA LAXMI
-              </span>
+              <div className="flex items-center gap-2.5">
+                <div className="relative h-8 w-8 rounded-full overflow-hidden border border-amber-400/50 shadow-xs flex-shrink-0 bg-[#260106]">
+                  <Image
+                    src="/icon.png"
+                    alt="MAA LAXMI Logo"
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <span className="font-playfair text-xl font-bold tracking-wider text-amber-400">
+                  MAA LAXMI
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}

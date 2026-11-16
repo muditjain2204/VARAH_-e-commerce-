@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
@@ -45,9 +46,18 @@ export function AdminHeader({}: AdminHeaderProps) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin"
-            className="font-playfair text-xl font-bold tracking-tight text-foreground"
+            className="font-playfair text-xl font-bold tracking-tight text-foreground flex items-center gap-2"
           >
-            MAA LAXMI
+            <div className="relative h-8 w-8 rounded-full overflow-hidden border border-amber-500/40 shadow-xs flex-shrink-0 bg-[#260106]">
+              <Image
+                src="/icon.png"
+                alt="MAA LAXMI Logo"
+                width={32}
+                height={32}
+                className="object-cover w-full h-full"
+              />
+            </div>
+            <span>MAA LAXMI</span>
           </Link>
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30">
             <ShieldCheck className="h-3.5 w-3.5 text-amber-600" />
